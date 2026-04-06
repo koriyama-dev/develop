@@ -1,0 +1,36 @@
+****************************************
+■Laravelインストール
+****************************************
+
+# 移動
+$ cd /var/www/html
+
+# composerインストーラーダウンロード
+$ wget https://getcomposer.org/installer -O composer-installer.php
+
+# composerインストール
+$ php composer-installer.php --filename=composer --install-dir=/usr/local/bin
+
+# バージョン確認
+$ composer -V
+
+# インストーラー削除
+$ rm -rf composer-installer.php
+
+# laravelインストール(バージョン指定)
+$ composer create-project laravel/laravel [プロジェクト名] --prefer-dist "[x].*"
+
+# 移動
+$ cd [プロジェクト名]
+
+# バージョン確認
+$ php artisan -V
+
+# crontab設定
+$ vi /etc/crontab
+
+# 追記
+* * * * * www-data php /var/www/html/[プロジェクト名]/artisan schedule:run >> /dev/null 2>&1
+
+# mod_rewrite有効化
+$ a2enmod rewrite

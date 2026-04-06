@@ -1,0 +1,10 @@
+[user]
+    name = koriyama
+[core]
+    # 改行コードをコミット時にLFに統一
+    autocrlf = input
+    # 大文字小文字を区別する
+    ignorecase = false
+[safe]
+    # WSL
+	directory = *

@@ -1,0 +1,24 @@
+{
+  "name": "base",
+  "dockerComposeFile": "../../../docker-compose.yaml",
+  "service": "app",
+  "workspaceFolder": "/var/www/html/base",
+  "runArgs": [
+    "--memory=4g",
+    "--cpus=2"
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "MS-CEINTL.vscode-language-pack-ja",
+        "ms-azuretools.vscode-docker",
+        "ms-azuretools.vscode-containers",
+        "bmewburn.vscode-intelephense-client",
+        "ionutvmi.path-autocomplete",
+        "xdebug.php-debug",
+        "cweijan.vscode-mysql-client2",
+        "Codeium.codeium"
+      ]
+    }
+  }
+}

@@ -1,0 +1,5 @@
+[wsl2]
+memory=12GB          # WSL2 VM 全体で使用可能なメモリ
+processors=4         # WSL2 VM で使うCPUコア
+swap=4GB             # スワップ領域
+localhostForwarding=true

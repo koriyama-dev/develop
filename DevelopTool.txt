@@ -1,0 +1,22 @@
+======== Tool =======
+Microsoft Edge( --inprivate)
+Google Chrome( --incognito)
+Excel
+Word
+PowerPoint
+秀丸エディタ
+SumatraPDF
+7-Zip
+クリップNOTE
+===== Dev Tool =======
+Windows Terminal ※管理者
+Git
+SourceTree
+WSL
+Docker Desktop for Windows
+Visual Studio Code
+DBeaver
+WinMerge
+RLogin
+WinSCP
+=====================

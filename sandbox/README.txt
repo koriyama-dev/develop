@@ -1,0 +1,125 @@
+****************************************
+■WSLインストール
+****************************************
+
+//////////
+PowerShell
+//////////
+
+# wslに必要なWindows機能の有効化、WSL2のインストール、最新のUbuntu(LTS)をインストール
+$ wsl --install
+
+# ユーザー作成
+Enter new UNIX username:
+> koriyama
+New password:
+> passwd
+
+# WSLログイン
+$ wsl
+
+# rootパスワード設定
+$ sudo passwd root
+[sudo] password for koriyama
+> passwd
+Enter new UNIX password:
+> passwd
+Retype new UNIX password:passwd
+> passwd
+
+# root昇格
+$ su root
+Password:
+> passwd
+
+# デフォルトユーザー変更
+$ vi /etc/wsl.conf
+
+# 追記
+[user]
+default=root
+
+# WSL再起動
+$ wsl --shutdown
+
+****************************************
+■Dockerインストール
+****************************************
+
+# Docker Desktop for Windowsインストール
+https://docs.docker.com/desktop/install/windows-install/
+
+# Docker Desktop起動
+
+# ※エクスプローラーからのWSLパス：\\wsl.localhost\Ubuntu
+
+# docker-composeファイル配置
+# /home/koriyama/develop
+
+//////////
+PowerShell
+//////////
+
+# WSLログイン
+$ wsl
+
+# 移動
+$ cd /home/koriyama/develop
+
+# ※docker-composeファイルのあるディレクトリ名がプロジェクト名となる
+
+# イメージビルド＋コンテナ起動(Dockerfileを更新した後も実行)
+$ docker-compose up -d --build
+
+# ※Dockerの起動と停止はdocker-compose上で行う(Docker Desktopでは行わない)
+
+****************************************
+■コマンド群
+****************************************
+
+##### docker-compose #####
+
+//////////
+PowerShell
+//////////
+
+# コンテナ起動
+$ docker-compose up -d
+
+# コンテナ停止
+$ docker-compose stop
+
+# コンテナ再起動
+$ docker-compose restart
+
+# イメージビルド＋コンテナ起動
+$ docker-compose up -d --build
+
+# コンテナ一覧
+$ docker-compose ps
+
+# イメージ一覧
+$ docker-compose images
+
+# ログ出力
+$ docker-compose logs [コンテナ名]
+
+# リアルタイムログ出力
+$ docker-compose logs -ft [コンテナ名]
+
+# コンテナログイン
+$ docker-compose exec [コンテナ名] bash
+
+##### docker #####
+
+# コンテナログイン
+$ docker exec -it [コンテナ名] bash
+
+# リアルタイムログ出力
+$ docker container exec -it [コンテナ名] tail -f [ログファイルパス]
+
+****************************************
+■Zone.Identifierファイル
+****************************************
+# 一括削除
+$ find . -type f -name "*:Zone.Identifier" -delete

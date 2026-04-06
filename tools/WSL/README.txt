@@ -1,0 +1,5 @@
+■場所
+C:\Users\[ユーザー]
+
+■WSL再起動
+$ wsl --shutdown

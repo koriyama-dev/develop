@@ -1,0 +1,82 @@
+services:
+  # --- Web Application (Apache) ---
+  app:
+    container_name: app
+    build:
+      context: .
+      dockerfile: ./docker/php/Dockerfile
+      target: apache_env
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - &APP_MOUNT_PATH "./src:/var/www/html"
+      - ./storage/apache/logs:/var/log/apache2
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # --- Database (MySQL 8.4 LTS) ---
+  db:
+    container_name: db
+    build:
+      context: .
+      dockerfile: ./docker/db/Dockerfile
+    environment:
+      - TZ=Asia/Tokyo
+      - MYSQL_ROOT_PASSWORD=passwd
+      - MYSQL_DATABASE=base
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./docker/db/init:/docker-entrypoint-initdb.d
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-ppasswd"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # --- Task Scheduler (Cron) ---
+  cron:
+    container_name: cron
+    environment:
+      XDEBUG_MODE: off
+    build:
+      context: .
+      dockerfile: ./docker/php/Dockerfile
+      target: cron_env
+    volumes:
+      - *APP_MOUNT_PATH
+      - ./storage/cron/logs:/var/log/cron
+    depends_on:
+      app:
+        condition: service_started
+
+  # --- Queue Worker (Supervisor) ---
+  supervisor:
+    container_name: supervisor
+    environment:
+      XDEBUG_MODE: off
+    build:
+      context: .
+      dockerfile: ./docker/php/Dockerfile
+      target: supervisor_env
+    volumes:
+      - *APP_MOUNT_PATH
+      - ./storage/supervisor/logs:/var/log/supervisor
+    depends_on:
+      app:
+        condition: service_started
+
+  # --- Mail Testing (MailHog) ---
+  mailhog:
+    container_name: mailhog
+    image: mailhog/mailhog:latest
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+volumes:
+  db_data:
+  maildir:

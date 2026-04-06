@@ -1,0 +1,62 @@
+****************************************
+■Ubuntu初期設定
+****************************************
+
+# リポジトリ更新と適用
+$ apt update && apt upgrade
+
+# OS日本語化
+$ apt install language-pack-ja
+
+# ロケール設定
+$ localectl set-locale LANG=ja_JP.UTF-8
+
+# 確認
+$ localectl status
+
+# タイムゾーン設定
+$ timedatectl set-timezone 'Asia/Tokyo'
+
+# 確認
+$ timedatectl status
+
+# ホスト名変更
+$ hostnamectl set-hostname [新ホスト名]
+
+# net-toolsインストール(ifconfig)
+$ apt install net-tools
+
+# 再起動
+$ reboot
+
+****************************************
+■IPv6無効化
+****************************************
+
+# systemctl用設定ファイル作成
+$ vi /etc/sysctl.d/60-ipv6-disable.conf
+
+# 追記
+net.ipv6.conf.all.disable_ipv6=1
+net.ipv6.conf.default.disable_ipv6=1
+net.ipv6.conf.lo.disable_ipv6=1
+
+# 設定を有効化
+$ systemctl restart procps
+
+# 起動時に設定適用
+$ vi /etc/rc.local
+
+# 追記
+#!/bin/bash
+systemctl restart procps
+exit 0
+
+# 権限設定
+$ chmod 755 /etc/rc.local
+
+# 再起動
+$ reboot
+
+# 確認
+$ ip -6 a
