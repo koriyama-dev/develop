@@ -11,7 +11,7 @@ $ wsl --install
 
 # ユーザー作成
 Enter new UNIX username:
-> koriyama
+> developer
 New password:
 > passwd
 
@@ -20,7 +20,7 @@ $ wsl
 
 # rootパスワード設定
 $ sudo passwd root
-[sudo] password for koriyama
+[sudo] password for developer
 > passwd
 Enter new UNIX password:
 > passwd
@@ -54,7 +54,7 @@ https://docs.docker.com/desktop/install/windows-install/
 # ※エクスプローラーからのWSLパス：\\wsl.localhost\Ubuntu
 
 # docker-composeファイル配置
-# /home/koriyama/develop
+# /home/developer/develop/sandbox
 
 //////////
 PowerShell
@@ -64,7 +64,7 @@ PowerShell
 $ wsl
 
 # 移動
-$ cd /home/koriyama/develop
+$ cd /home/developer/develop/sandbox
 
 # ※docker-composeファイルのあるディレクトリ名がプロジェクト名となる
 

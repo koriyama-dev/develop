@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
-use App\Events\TestCompleted;
+use App\Events\TestEvent;
+use App\Jobs\TestJobs;
 
 class TestController extends Controller
 {
@@ -13,12 +14,22 @@ class TestController extends Controller
      */
     public function index()
     {
-        // イベントの呼び出し
-        $user = User::findOrNew(1);
+        $user = new User;
         $user->name = "太郎";
-        TestCompleted::dispatch($user);
+        $user->email = "";
+        $user->password = "";
+        $user->save();
+
+        // イベント実行
+        TestEvent::dispatch($user);
         // event(new TestCompleted($user)); これでもOK
-var_dump("OK!");exit;
+var_dump("test event OK!");
+echo "<br>";
+
+        // job実行
+        TestJobs::dispatch($user);
+        // TestEvent::dispatch($user)->afterCommit(); DBのトランザクションがコミットされたら実行
+var_dump("test job OK!");exit;
     }
 
     /**

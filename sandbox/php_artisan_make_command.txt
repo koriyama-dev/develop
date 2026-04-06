@@ -20,6 +20,10 @@
     app/Jobs
         コマンド: php artisan make:job [Name]
         用途: キューでバックグラウンド実行する重い処理
+              Commandとの使い分けとしては
+              Command: 主に開発者やシステム（OSのCron）が手動または定期的に実行するもの
+              Job: 主にアプリケーションの処理中に、ユーザーを待たせないために「バックグラウンド(非同期)」の「タスク単位」
+                   DBは使うが、結果をユーザーが即座に知る必要がないもの」は、積極的に非同期化すべき
 
     app/Observers
         コマンド: php artisan make:observer [Name]

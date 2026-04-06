@@ -37,7 +37,7 @@
 ・ターミナルから「wsl」でログイン
 
 ・wslのフォルダを開く
-$ code /home/koriyama/develop/src/base
+$ code /home/developer/develop/sandbox/src/base
 
 ・ターミナルからコンテナ起動
 $ docker-compose up --build
@@ -52,7 +52,7 @@ $ docker-compose up
 ・再度ターミナルから「wsl」でログイン
 
 ・再度wslのフォルダを開く
-$ code /home/koriyama/develop/src/base
+$ code /home/developer/develop/sandbox/src/base
 
 ****************************************
 ■Xdebug

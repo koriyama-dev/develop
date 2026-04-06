@@ -2,9 +2,9 @@
 
 namespace App\Listeners;
 
-use App\Events\TestCompleted;
+use App\Events\TestEvent;
 
-class WriteDebugLog
+class TestWriteInfoLog
 {
     /**
      * Create the event listener.
@@ -17,9 +17,9 @@ class WriteDebugLog
     /**
      * Handle the event.
      */
-    public function handle(TestCompleted $event): void
+    public function handle(TestEvent $event): void
     {
-        logs()->info($event->user->name . "：event WriteDebugLog OK!");
+        logs()->info($event->user->name . "：test event TestWriteInfoLog OK!");
     }
 
     // 通常Event::listen や $listen プロパティへの記述が必要になる。

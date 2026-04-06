@@ -6,14 +6,14 @@ use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
-#[Signature('app:test-command')]
-// protected $signature = 'app:test-command';と同義
-
-#[Description('Command description')]
-// protected $description = 'Command description';と同義
-
 class TestCommand extends Command
 {
+    // コマンドの実行方法
+    protected $signature = 'app:test-command';
+
+    // コマンドの説明
+    protected $description = 'test-command description';
+
     /**
      * Execute the console command.
      */
