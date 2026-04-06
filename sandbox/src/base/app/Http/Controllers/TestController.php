@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Events\TestEvent;
 use App\Jobs\TestJobs;
@@ -16,8 +17,8 @@ class TestController extends Controller
     {
         $user = new User;
         $user->name = "太郎";
-        $user->email = "";
-        $user->password = "";
+        $user->email = $user->email = fake()->unique()->safeEmail();;
+        $user->password = Hash::make('password123');
         $user->save();
 
         // イベント実行

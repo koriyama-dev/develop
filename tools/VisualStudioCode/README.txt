@@ -24,9 +24,11 @@
 
 ・PHP Intelephense
 
-・Path Autocomplete
+・PHP Debug
 
 ・MySQL
+
+・Windsurf Plugin (formerly Codeium)
 
 ****************************************
 ■WSLとコンテナ操作
@@ -61,7 +63,7 @@ $ code /home/developer/develop/sandbox/src/base
 ・明示的にリクエストを毎回送る
 
 【ブラウザ】
-http://localhost:8000/?XDEBUG_SESSION=1
+https://base.local/?XDEBUG_SESSION=1
 
 【CLI】
 $ XDEBUG_SESSION=1 php artisan migrate

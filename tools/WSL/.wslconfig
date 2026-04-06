@@ -1,5 +1,11 @@
 [wsl2]
-memory=12GB          # WSL2 VM 全体で使用可能なメモリ
-processors=4         # WSL2 VM で使うCPUコア
-swap=4GB             # スワップ領域
+# WSL2が使用する最大メモリ。ホストの半分(8GB)に制限し、Windows側の安定性を確保。
+memory=8GB
+# 使用するCPUコア数。4コア割り当てることでビルド速度を向上。
+processors=4
+# メモリ不足時の退避領域。物理メモリの負荷を抑えるため2GBに設定。
+swap=2GB
+# ホストから localhost:ポート でコンテナにアクセス可能にする。
 localhostForwarding=true
+# 【重要】WSL2内の未使用メモリをWindowsに自動返却し、メモリ肥大化を防止。
+autoMemoryReclaim=gradual

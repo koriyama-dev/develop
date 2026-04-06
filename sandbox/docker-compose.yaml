@@ -1,51 +1,57 @@
 services:
-  # --- Web Application (Apache) ---
+  # --- Webサーバー (Apache + PHP 8.5) ---
   app:
     container_name: app
     build:
       context: .
       dockerfile: ./docker/php/Dockerfile
-      target: apache_env
+      target: apache_env # Dockerfile内のApache用ステージを使用
     ports:
-      - "80:80"
-      - "443:443"
+      - "${APP_PORT:-80}:80"      # HTTPポート (デフォルト80)
+      - "${APP_SSL_PORT:-443}:443" # HTTPSポート (デフォルト443)
     volumes:
-      - &APP_MOUNT_PATH "./src:/var/www/html"
-      - ./storage/apache/logs:/var/log/apache2
+      - &APP_MOUNT_PATH "./src:/var/www/html" # ソースコードを同期
+      - ./storage/apache/logs:/var/log/apache2 # Apacheのログをホストで確認
+    environment:
+      XDEBUG_MODE: ${XDEBUG_MODE:-off} # デバッグモードの切り替え
+      XDEBUG_CONFIG: "client_port=9003"
+    # WSL2からWindowsホストへ通信を通す
+    extra_hosts:
+      - "${XDEBUG_CLIENT_HOST:-host.docker.internal}:host-gateway"
     depends_on:
       db:
-        condition: service_healthy
+        condition: service_healthy # DBが完全に起動してからAppを起動
 
-  # --- Database (MySQL 8.4 LTS) ---
+  # --- データベース (MySQL 8.4 LTS) ---
   db:
     container_name: db
-    build:
-      context: .
-      dockerfile: ./docker/db/Dockerfile
+    image: mysql:8.4 # 軽量化のためimage指定。my.cnfは下部でマウント
     environment:
-      - TZ=Asia/Tokyo
-      - MYSQL_ROOT_PASSWORD=passwd
-      - MYSQL_DATABASE=base
+      - TZ=${TZ:-Asia/Tokyo}
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${DB_DATABASE}
     ports:
-      - "3306:3306"
+      - "${DB_PORT:-3306}:3306"
     volumes:
-      - ./docker/db/init:/docker-entrypoint-initdb.d
-      - db_data:/var/lib/mysql
+      - ./docker/db/my.cnf:/etc/mysql/conf.d/my.cnf # 設定ファイルの反映
+      - ./docker/db/init:/docker-entrypoint-initdb.d # 初回起動時のSQL実行用
+      - db_data:/var/lib/mysql # DBデータの永続化
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-ppasswd"]
-      interval: 5s
+      # .envのパスワードを使ってDBの生存確認を行う
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p\"$$MYSQL_ROOT_PASSWORD\""]
+      interval: 10s
       timeout: 5s
-      retries: 10
+      retries: 5
 
-  # --- Task Scheduler (Cron) ---
+  # --- 定期実行 (Cron) ---
   cron:
     container_name: cron
-    environment:
-      XDEBUG_MODE: off
     build:
       context: .
       dockerfile: ./docker/php/Dockerfile
       target: cron_env
+    environment:
+      XDEBUG_MODE: off # 負荷軽減のためデバッグはオフ
     volumes:
       - *APP_MOUNT_PATH
       - ./storage/cron/logs:/var/log/cron
@@ -53,15 +59,15 @@ services:
       app:
         condition: service_started
 
-  # --- Queue Worker (Supervisor) ---
+  # --- キュー処理 (Supervisor) ---
   supervisor:
     container_name: supervisor
-    environment:
-      XDEBUG_MODE: off
     build:
       context: .
       dockerfile: ./docker/php/Dockerfile
       target: supervisor_env
+    environment:
+      XDEBUG_MODE: off # 負荷軽減のためデバッグはオフ
     volumes:
       - *APP_MOUNT_PATH
       - ./storage/supervisor/logs:/var/log/supervisor
@@ -69,14 +75,19 @@ services:
       app:
         condition: service_started
 
-  # --- Mail Testing (MailHog) ---
+  # --- メールテスト (MailHog) ---
   mailhog:
     container_name: mailhog
     image: mailhog/mailhog:latest
+    # メールの保存先をメモリではなくファイル(maildir)に指定
+    command: ["-storage=maildir", "-maildir-path=/tmp/mailhog"]
     ports:
-      - "1025:1025"
-      - "8025:8025"
+      - "${MAIL_PORT:-1025}:1025"         # SMTP受信用
+      - "${MAIL_DASHBOARD_PORT:-8025}:8025" # ブラウザ確認用
+    volumes:
+      # ホストの ./storage/mailhog に保存。コンテナを消してもメールが残る
+      - *APP_MOUNT_PATH
+      - ./storage/mailhog:/tmp/mailhog
 
 volumes:
-  db_data:
-  maildir:
+  db_data: # MySQLデータ保存用の領域を定義
