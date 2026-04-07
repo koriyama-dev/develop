@@ -3,10 +3,6 @@ Laravel(ver13)インストール
 PHP8.5＋MySQL8.4
 ****************************************
 
-//////////
-PowerShell
-//////////
-
 # コンテナログイン
 
 # 移動
@@ -24,11 +20,9 @@ $ npm install
 # npm実行
 $ npm run dev
 
-# コンテナ権限変更
-$ chmod 777 -R /var/www/html
-
-# ※Windowsから作成されたファイルの所有者→root
-# ※Apacheから作成されたファイルの所有者→www-data
+# 所有者変更
+$ chown www-data:www-data /var/www
+$ chown -R www-data:www-data /var/www/html
 
 # シンボリックリンク作成
 $ php artisan storage:link

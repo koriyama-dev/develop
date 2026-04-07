@@ -2,10 +2,6 @@
 ■WSLインストール
 ****************************************
 
-//////////
-PowerShell
-//////////
-
 # wslに必要なWindows機能の有効化、WSL2のインストール、最新のUbuntu(LTS)をインストール
 $ wsl --install
 
@@ -42,6 +38,8 @@ default=root
 # WSL再起動
 $ wsl --shutdown
 
+# エクスプローラーからのWSLパス：\\wsl.localhost\Ubuntu
+
 ****************************************
 ■Dockerインストール
 ****************************************
@@ -51,37 +49,20 @@ https://docs.docker.com/desktop/install/windows-install/
 
 # Docker Desktop起動
 
-# ※エクスプローラーからのWSLパス：\\wsl.localhost\Ubuntu
-
-# docker-composeファイル配置
-# /home/developer/develop/sandbox
-
-//////////
-PowerShell
-//////////
-
 # WSLログイン
 $ wsl
 
-# 移動
+# docker-composeファイルに移動
 $ cd /home/developer/develop/sandbox
 
-# ※docker-composeファイルのあるディレクトリ名がプロジェクト名となる
-
-# イメージビルド＋コンテナ起動(Dockerfileを更新した後も実行)
+# イメージビルド＋コンテナ起動
 $ docker-compose up -d --build
-
-# ※Dockerの起動と停止はdocker-compose上で行う(Docker Desktopでは行わない)
 
 ****************************************
 ■コマンド群
 ****************************************
 
 ##### docker-compose #####
-
-//////////
-PowerShell
-//////////
 
 # コンテナ起動
 $ docker-compose up -d

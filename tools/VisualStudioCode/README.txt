@@ -47,7 +47,9 @@ $ docker-compose up
 
 【コンテナログイン】
 
-・WSLログイン状態で「Ctrl + Shift + P」でコマンドパレットから「Dev Containers: Rebuild Container」を選択
+・WSLログイン状態で「Ctrl + Shift + P」でコマンドパレットから
+DockerFileや設定ファイルの変更時：「Dev Containers: Rebuild Container」を選択
+次回以降コンテナを開く時：「Dev Containers: Reopen in Container」を選択
 
 【WSLとコンテナの2ウィンドウ】
 

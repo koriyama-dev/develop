@@ -25,7 +25,7 @@ services:
   # --- データベース (MySQL 8.4 LTS) ---
   db:
     container_name: db
-    image: mysql:8.4 # 軽量化のためimage指定。my.cnfは下部でマウント
+    image: mysql:8.4 # 軽量化のためimage指定
     environment:
       - TZ=${TZ:-Asia/Tokyo}
       - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
@@ -37,7 +37,7 @@ services:
       - ./docker/db/init:/docker-entrypoint-initdb.d # 初回起動時のSQL実行用
       - db_data:/var/lib/mysql # DBデータの永続化
     healthcheck:
-      # .envのパスワードを使ってDBの生存確認を行う
+      # DBの生存確認を行う
       test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p\"$$MYSQL_ROOT_PASSWORD\""]
       interval: 10s
       timeout: 5s
@@ -85,7 +85,7 @@ services:
       - "${MAIL_PORT:-1025}:1025"         # SMTP受信用
       - "${MAIL_DASHBOARD_PORT:-8025}:8025" # ブラウザ確認用
     volumes:
-      # ホストの ./storage/mailhog に保存。コンテナを消してもメールが残る
+      # ホストの ./storage/mailhog に保存することで、コンテナを消してもメールが残る
       - *APP_MOUNT_PATH
       - ./storage/mailhog:/tmp/mailhog
 
