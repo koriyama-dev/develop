@@ -7,5 +7,3 @@ processors=4
 swap=2GB
 # ホストから localhost:ポート でコンテナにアクセス可能にする。
 localhostForwarding=true
-# 【重要】WSL2内の未使用メモリをWindowsに自動返却し、メモリ肥大化を防止。
-autoMemoryReclaim=gradual
