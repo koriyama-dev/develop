@@ -3,13 +3,13 @@ Laravel(ver13)インストール
 PHP8.5＋MySQL8.4
 ****************************************
 
-# コンテナログイン
+# コンテナから実行
 
 # 移動
 $ cd /var/www/html
 
 # Laravelインストール
-$ composer create-project laravel/laravel base --prefer-dist "13.*"
+$ composer create-project laravel/laravel --prefer-dist "13.*"
 
 # 移動
 $ cd base
@@ -20,7 +20,7 @@ $ npm install
 # npm実行
 $ npm run dev
 
-# コンテナからログアウト
+# WSLから実行
 
 # WSLのIP確認
 $ wsl -e hostname -I
@@ -37,21 +37,22 @@ Laravel 初期設定
 # .env設定
 APP_URL=https://base.local
 
+APP_TIMEZONE=Asia/Tokyo
 APP_LOCALE=ja
 APP_FALLBACK_LOCALE=ja
 APP_FAKER_LOCALE=ja_JP
 
 LOG_CHANNEL=daily
 
-DB_CONNECTION=mysql
+DB_CONNECTION=mysql # mysql
 DB_HOST=db # Dockerコンテナ名を指定
 DB_PORT=3306 # Dockerコンテナポートを指定
 DB_DATABASE=base
 DB_USERNAME=root
 DB_PASSWORD=passwd
 
-MAIL_MAILER=smtp
-MAIL_HOST=mailhog # Dockerコンテナ名を指定
+MAIL_MAILER=smtp # smtp
+MAIL_HOST=mailpit # Dockerコンテナ名を指定
 MAIL_PORT=1025 # Dockerコンテナポートを指定
 
 # composer.json設定
@@ -59,18 +60,20 @@ MAIL_PORT=1025 # Dockerコンテナポートを指定
     "php": "^8.5",
 },
 
+# WSLから実行
+
 # ide-helperのインストール
-$ docker compose exec -w /var/www/html/base app composer require --dev barryvdh/laravel-ide-helper
+$ docker compose exec -w /var/www/html app composer require --dev barryvdh/laravel-ide-helper
 
 # ide-helperファイルの生成
-$ docker compose exec -w /var/www/html/base app php artisan ide-helper:generate
+$ docker compose exec -w /var/www/html app php artisan ide-helper:generate
 
 # 言語ファイルインストール
-$ docker compose exec -w /var/www/html/base app composer require laravel-lang/common --dev
-$ docker compose exec -w /var/www/html/base app php artisan lang:add ja
+$ docker compose exec -w /var/www/html app composer require laravel-lang/common --dev
+$ docker compose exec -w /var/www/html app php artisan lang:add ja
 
 # シンボリックリンク作成
-$ docker compose exec -w /var/www/html/base app php artisan storage:link
+$ docker compose exec -w /var/www/html app php artisan storage:link
 
 # 所有者変更
 $ docker compose exec app chown www-data:www-data /var/www

@@ -1,8 +1,8 @@
 {
   "name": "base",
-  "dockerComposeFile": "../../../docker-compose.yaml",
+  "dockerComposeFile": "../../docker-compose.yaml",
   "service": "app",
-  "workspaceFolder": "/var/www/html/base",
+  "workspaceFolder": "/var/www/html",
   "remoteUser": "www-data",
   "updateRemoteUserUID": true,
   "customizations": {

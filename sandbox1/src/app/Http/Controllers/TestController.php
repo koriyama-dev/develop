@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Events\TestEvent;
 use App\Jobs\TestJobs;
+use App\Mail\TestMail;
+use Illuminate\Support\Facades\Mail;
 
 class TestController extends Controller
 {
@@ -25,13 +27,15 @@ class TestController extends Controller
         // イベント実行
         TestEvent::dispatch($user);
         // event(new TestCompleted($user)); これでもOK
-var_dump("test event OK!");
-echo "<br>";
 
         // job実行
         TestJobs::dispatch($user);
         // TestEvent::dispatch($user)->afterCommit(); DBのトランザクションがコミットされたら実行
-var_dump("test job OK!");exit;
+
+        // メール通知
+        Mail::to('hoge@example.com')->send(new TestMail($user));
+
+        return view('welcome');
     }
 
     /**

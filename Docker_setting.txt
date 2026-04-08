@@ -63,7 +63,8 @@ $ docker compose up -d --build
 ■コマンド群
 ****************************************
 
-##### docker compose #####
+# イメージビルド＋コンテナ起動
+$ docker compose up -d --build
 
 # コンテナ起動
 $ docker compose up -d
@@ -74,31 +75,15 @@ $ docker compose stop
 # コンテナ再起動
 $ docker compose restart
 
-# イメージビルド＋コンテナ起動
-$ docker compose up -d --build
-
-# コンテナ一覧
-$ docker compose ps
-
-# イメージ一覧
-$ docker compose images
-
-# ログ出力
-$ docker compose logs [コンテナ名]
+# コンテナログイン
+$ docker compose exec app bash
+$ docker compose exec db bash
 
 # リアルタイムログ出力
-$ docker compose logs -ft [コンテナ名]
-
-# コンテナログイン
-$ docker compose exec [コンテナ名] bash
-
-##### docker #####
-
-# コンテナログイン
-$ docker exec -it [コンテナ名] bash
-
-# リアルタイムログ出力
-$ docker container exec -it [コンテナ名] tail -f [ログファイルパス]
+$ docker compose logs -ft app
+$ docker compose logs -ft app | grep "\[APACHE\]"
+$ docker compose logs -ft app | grep "\[SCHEDULER\]"
+$ docker compose logs -ft app | grep "\[WORKER\]"
 
 ****************************************
 ■Zone.Identifierファイル

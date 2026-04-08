@@ -1,5 +1,0 @@
-# 1分ごとに Laravel のスケジュールを実行
-# . /etc/environment; を入れることで、Docker の環境変数 (DBパスワード等) を PHP 伝える
-* * * * * www-data . /etc/environment; /usr/local/bin/php /var/www/html/base/artisan schedule:run >> /var/log/cron/cron.log 2>&1
-
-# ログが無限に増えてディスクを圧迫するのを防ぐため、空行を1つ入れる
