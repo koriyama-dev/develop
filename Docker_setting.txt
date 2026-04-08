@@ -80,10 +80,10 @@ $ docker compose exec app bash
 $ docker compose exec db bash
 
 # リアルタイムログ出力
-$ docker compose logs -ft app
-$ docker compose logs -ft app | grep "\[APACHE\]"
-$ docker compose logs -ft app | grep "\[SCHEDULER\]"
-$ docker compose logs -ft app | grep "\[WORKER\]"
+$ docker compose logs -f app
+$ docker compose logs -f app | grep "\[APACHE\]"
+$ docker compose logs -f app | grep "\[SCHEDULER\]"
+$ docker compose logs -f app | grep "\[WORKER\]"
 
 ****************************************
 ■Zone.Identifierファイル
