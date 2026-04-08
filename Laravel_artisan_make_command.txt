@@ -28,6 +28,7 @@
     app/Observers
         コマンド: php artisan make:observer [Name]
         用途: モデルの保存や更新などの監視と自動処理
+             「システムが勝手にやっておいてほしいこと」はオブザーバ、「エンジニアが意図的に実行したいこと」はService/Contr              oller、と分ける
 
 # 2. HTTP / API / Validation
 # リクエスト制御や入力チェックを行う機能です。

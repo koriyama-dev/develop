@@ -48,48 +48,49 @@ $ wsl --shutdown
 https://docs.docker.com/desktop/install/windows-install/
 
 # Docker Desktop起動
+# Settings→Resources→WSL integration→UbuntuをON
 
 # WSLログイン
 $ wsl
 
 # docker-composeファイルに移動
-$ cd /home/developer/develop/sandbox
+$ cd /home/developer/develop/sandbox1
 
 # イメージビルド＋コンテナ起動
-$ docker-compose up -d --build
+$ docker compose up -d --build
 
 ****************************************
 ■コマンド群
 ****************************************
 
-##### docker-compose #####
+##### docker compose #####
 
 # コンテナ起動
-$ docker-compose up -d
+$ docker compose up -d
 
 # コンテナ停止
-$ docker-compose stop
+$ docker compose stop
 
 # コンテナ再起動
-$ docker-compose restart
+$ docker compose restart
 
 # イメージビルド＋コンテナ起動
-$ docker-compose up -d --build
+$ docker compose up -d --build
 
 # コンテナ一覧
-$ docker-compose ps
+$ docker compose ps
 
 # イメージ一覧
-$ docker-compose images
+$ docker compose images
 
 # ログ出力
-$ docker-compose logs [コンテナ名]
+$ docker compose logs [コンテナ名]
 
 # リアルタイムログ出力
-$ docker-compose logs -ft [コンテナ名]
+$ docker compose logs -ft [コンテナ名]
 
 # コンテナログイン
-$ docker-compose exec [コンテナ名] bash
+$ docker compose exec [コンテナ名] bash
 
 ##### docker #####
 

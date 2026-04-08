@@ -19,6 +19,7 @@ class TestController extends Controller
         $user->name = "太郎";
         $user->email = $user->email = fake()->unique()->safeEmail();;
         $user->password = Hash::make('password123');
+        // observer実行
         $user->save();
 
         // イベント実行

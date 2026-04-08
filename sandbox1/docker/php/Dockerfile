@@ -46,7 +46,7 @@ CMD ["apache2-foreground"]
 
 # --- ステージ: Cron用 ---
 FROM base AS cron_env
-COPY ./docker/php/cron-root /etc/cron.d/laravel-cron
+COPY ./docker/php/cron-www-data /etc/cron.d/laravel-cron
 RUN chmod 0644 /etc/cron.d/laravel-cron && crontab /etc/cron.d/laravel-cron
 # 環境変数を引き継いでcronを実行
 CMD ["sh", "-c", "printenv > /etc/environment && cron -f"]
