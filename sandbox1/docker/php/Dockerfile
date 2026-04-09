@@ -13,7 +13,6 @@ ARG GROUP_ID=1000
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
 # 必要なシステムパッケージのインストール
-# supervisor: 複数プロセス管理用 / vim: コンテナ内デバッグ用
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     gnupg \
@@ -73,7 +72,7 @@ COPY ./docker/php/worker.conf /etc/supervisor/conf.d/worker.conf
 # Laravelのディレクトリ作成と権限の一括付与
 RUN mkdir -p /var/www/html && chown -R www-data:www-data /var/www/html
 
-# --- [重要] メインプロセスの指定 ---
+# --- メインプロセスの指定 ---
 # Apache単体ではなく、Supervisorをコンテナの主役(PID 1)として起動します。
 # これにより、Supervisorが管理する全プロセスのログが docker logs に集約されます。
 CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/worker.conf"]
