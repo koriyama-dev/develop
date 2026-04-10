@@ -1,6 +1,7 @@
 # ==============================================================================
 # 1. 共通ベースイメージ (PHP 8.5 + Apache)
 # ==============================================================================
+FROM node:22-slim AS node_lib
 FROM php:8.5-apache AS base
 
 ENV TZ=Asia/Tokyo
@@ -26,15 +27,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Laravel 13 / PHP 8.5 に必要な拡張機能を一括インストール
-RUN install-php-extensions pdo_mysql gd bcmath intl exif zip opcache xdebug
+RUN install-php-extensions pdo_mysql gd bcmath intl exif zip opcache xdebug redis pcntl
 
 # カスタム php.ini の設置
 COPY ./docker/php/php.ini /usr/local/etc/php/php.ini
 
 # Node.js (LTS) の導入: Viteやnpmスクリプト実行用
-RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
-    && apt-get install -y nodejs \
-    && npm install -g npm@latest
+COPY --from=node_lib /usr/local/bin /usr/local/bin
+COPY --from=node_lib /usr/local/lib/node_modules /usr/local/lib/node_modules
+RUN ln -sf /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm
 
 # Composer (最新版) の配置
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer

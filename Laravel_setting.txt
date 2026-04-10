@@ -51,6 +51,17 @@ DB_DATABASE=base
 DB_USERNAME=root
 DB_PASSWORD=passwd
 
+REDIS_CLIENT=phpredis
+REDIS_HOST=redis # Dockerコンテナ名を指定
+REDIS_PORT=6379  # Dockerコンテナポートを指定
+CACHE_STORE=redis
+QUEUE_CONNECTION=redis
+
+# 各機能でRedisを使用するように変更
+CACHE_STORE=redis
+SESSION_DRIVER=redis
+QUEUE_CONNECTION=redis
+
 MAIL_MAILER=smtp # smtp
 MAIL_HOST=mailpit # Dockerコンテナ名を指定
 MAIL_PORT=1025 # Dockerコンテナポートを指定
@@ -71,6 +82,9 @@ $ docker compose exec -w /var/www/html app php artisan ide-helper:generate
 # 言語ファイルインストール
 $ docker compose exec -w /var/www/html app composer require laravel-lang/common --dev
 $ docker compose exec -w /var/www/html app php artisan lang:add ja
+
+# Redisインストール
+$ docker compose exec -w /var/www/html app composer require predis/predis
 
 # シンボリックリンク作成
 $ docker compose exec -w /var/www/html app php artisan storage:link

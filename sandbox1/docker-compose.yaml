@@ -42,10 +42,20 @@ services:
     healthcheck:
       # MySQLがクエリを受け付けられる状態かチェック
       # これにより、Appコンテナ起動時の「DB接続待ちエラー」を防止します
-      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p\"$$MYSQL_ROOT_PASSWORD\""]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}"]
       interval: 10s
       timeout: 5s
       retries: 5
+
+  # --- メモリデータベース (Redis 7) ---
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    command: redis-server --appendonly yes # データの永続化を有効化
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
 
   # --- メールテスト (Mailpit) ---
   # 開発中に送信されるメールをキャッチしてブラウザで確認可能にします
@@ -60,7 +70,8 @@ services:
     volumes:
       - mailpit_data:/data
 
-# データの永続化設定
+# データの永続化設定（コンテナを消しても残る）
 volumes:
-  db_data:      # MySQLのデータ（コンテナを消してもDBは残る）
-  mailpit_data: # メールの履歴データ（コンテナを消してもメールは残る）
+  db_data:      # MySQLのデータ
+  mailpit_data: # メールの履歴データ
+  redis_data:   # redisのデータ
