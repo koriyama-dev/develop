@@ -9,6 +9,7 @@ use App\Events\TestEvent;
 use App\Jobs\TestJobs;
 use App\Mail\TestMail;
 use Illuminate\Support\Facades\Mail;
+use App\Exceptions\TestException;
 
 class TestController extends Controller
 {
@@ -35,7 +36,19 @@ class TestController extends Controller
         // メール通知
         Mail::to('hoge@example.com')->send(new TestMail($user));
 
-        return view('welcome');
+        return view('test.index');
+    }
+
+    /**
+     * Error test page.
+     *
+    * @return \Illuminate\Http\Response
+    */
+    public function error()
+    {
+        $user = new User;
+        $user->name = "太郎";
+        throw new TestException('Operation error', 101, ['user_name' => $user->name]);
     }
 
     /**

@@ -35,3 +35,5 @@ Route::get('/', function () {
 // php artisan make:controller TestController --resource
 // 「php artisan route:list」を実行して確認可能
 Route::resource('test', TestController::class);
+
+Route::get('/test-error', [TestController::class, 'error'])->name('test.error');
