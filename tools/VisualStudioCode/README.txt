@@ -43,13 +43,14 @@ $ code /home/developer/develop/sandbox1/src
 
 ・ターミナルからコンテナ起動
 $ docker-compose up --build
+or
 $ docker-compose up
 
 【コンテナログイン】
 
 ・WSLログイン状態で「Ctrl + Shift + P」でコマンドパレットから
 DockerFileや設定ファイルの変更時：「Dev Containers: Rebuild Container」を選択
-次回以降コンテナを開く時：「Dev Containers: Reopen in Container」を選択
+次回以降で設定の変更が無い場合  ：「Dev Containers: Reopen in Container」を選択
 
 【WSLとコンテナの2ウィンドウ】
 

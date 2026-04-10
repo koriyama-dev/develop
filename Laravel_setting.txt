@@ -11,14 +11,12 @@ $ cd /var/www/html
 # Laravelインストール
 $ composer create-project laravel/laravel --prefer-dist "13.*"
 
-# 移動
-$ cd base
-
 # npmインストール
 $ npm install
 
 # npm実行
 $ npm run dev
+# Ctrl+Cで終了
 
 # WSLから実行
 
@@ -71,7 +69,8 @@ MAIL_PORT=1025 # Dockerコンテナポートを指定
     "php": "^8.5",
 },
 
-# WSLから実行
+# migration実行
+$ docker compose exec app php artisan migrate
 
 # ide-helperのインストール
 $ docker compose exec -w /var/www/html app composer require --dev barryvdh/laravel-ide-helper
@@ -93,10 +92,34 @@ $ docker compose exec -w /var/www/html app php artisan storage:link
 $ docker compose exec app chown www-data:www-data /var/www
 $ docker compose exec app chown -R www-data:www-data /var/www/html
 
+************************************
+Laravel 疎通確認
+************************************
+
+# DB
+$ docker compose exec app php artisan tinker
+> DB::connection()->getPdo();
+
+# mailpitに送信
+$ docker compose exec app php artisan tinker
+> Mail::raw('Mailpit Test', fn($m) => $m->to('test@example.com')->subject('Hello Mailpit'));
+
+# Laravelのschedule:testを使う
+$ docker compose logs -f app | grep "\[SCHEDULER\]"
+$ docker compose exec app php artisan schedule:test
+
+$ job
+$ docker compose logs -f app | grep "\[WORKER\]"
+$ docker compose exec app php artisan tinker --execute="Artisan::queue('about')"
+
+# redis
+$ docker compose exec app php artisan tinker
+> \Illuminate\Support\Facades\Redis::ping();
+
 # ブラウザ表示確認
 https://base.local
 
-# ブラウザMailHog確認
+# ブラウザmailpit確認
 http://localhost:8025
 
 ****************************************
