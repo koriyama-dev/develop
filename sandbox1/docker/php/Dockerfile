@@ -6,14 +6,14 @@ FROM php:8.5-apache AS base
 
 ENV TZ=Asia/Tokyo
 
-# WSL2(Ubuntu)の一般ユーザーUID/GID(通常1000)に合わせ、権限トラブルを防止
+# WSL2(Ubuntu)の一般ユーザーUID/GID(通常1000)に合わせる
 ARG USER_ID=1000
 ARG GROUP_ID=1000
 
-# PHP拡張インストーラー (公式推奨の導入手法)
+# PHP拡張インストーラー
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
-# 必要なシステムパッケージのインストール
+# システムパッケージのインストール
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     gnupg \
@@ -26,22 +26,23 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Laravel 13 / PHP 8.5 に必要な拡張機能を一括インストール
+# Laravel 13 / PHP 8.5 に必要な拡張機能をインストール
 RUN install-php-extensions pdo_mysql gd bcmath intl exif zip opcache xdebug redis pcntl
 
-# カスタム php.ini の設置
+# カスタム php.ini 設置
 COPY ./docker/php/php.ini /usr/local/etc/php/php.ini
 
-# Node.js (LTS) の導入: Viteやnpmスクリプト実行用
+# Node.js (LTS) のインストール
 COPY --from=node_lib /usr/local/bin /usr/local/bin
 COPY --from=node_lib /usr/local/lib/node_modules /usr/local/lib/node_modules
+# npm のエントリーポイントを明示的にシンボリックリンク
 RUN ln -sf /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm
 
 # Composer (最新版) の配置
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # 権限設定: www-dataユーザーのUID/GIDをホスト(WSL2)側に合わせる
-# これにより、ログファイルやキャッシュの書き込み権限エラーを回避
+# これでログファイルやキャッシュの書き込み権限エラーを回避
 RUN usermod -u ${USER_ID} www-data && groupmod -g ${GROUP_ID} www-data \
     && chsh -s /bin/bash www-data
 
@@ -50,7 +51,7 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Tokyo /etc/localtime && \
     echo "Asia/Tokyo" > /etc/timezone
 
 # 作業ディレクトリの所有者を変更
-RUN chown www-data:www-data /var/www
+RUN chown www-data:www-data /var/www && chown -R www-data:www-data /var/www/html
 WORKDIR /var/www/html
 
 # ==============================================================================
@@ -58,22 +59,19 @@ WORKDIR /var/www/html
 # ==============================================================================
 FROM base AS apache_env
 
-# Apacheの設定 (VirtualHost / SSL / Rewrite)
+# Apache設定
 COPY ./docker/php/000-default.conf /etc/apache2/sites-available/000-default.conf
 COPY ./docker/ssl/ssl.crt /etc/ssl/certs/ssl-cert-snakeoil.pem
 COPY ./docker/ssl/ssl.key /etc/ssl/private/ssl-cert-snakeoil.key
 
-# Apacheモジュールの有効化 (Laravelのルーティングにrewriteは必須)
+# Apacheモジュール有効化
 RUN a2enmod rewrite ssl headers && a2ensite default-ssl
 
-# --- Supervisorの設定ファイルをコピー ---
-# このファイルに Apache, Worker, Scheduler の起動定義を記述します
+# Supervisorの設定
+# Apache, Worker, Scheduler の起動定義
 COPY ./docker/php/worker.conf /etc/supervisor/conf.d/worker.conf
 
-# Laravelのディレクトリ作成と権限の一括付与
-RUN mkdir -p /var/www/html && chown -R www-data:www-data /var/www/html
-
-# --- メインプロセスの指定 ---
-# Apache単体ではなく、Supervisorをコンテナの主役(PID 1)として起動します。
-# これにより、Supervisorが管理する全プロセスのログが docker logs に集約されます。
+# メインプロセスの指定
+# Apache単体ではなく、Supervisorをコンテナの主役(PID 1)として起動
+# これでSupervisorが管理する全プロセスのログが docker logs に集約
 CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/worker.conf"]

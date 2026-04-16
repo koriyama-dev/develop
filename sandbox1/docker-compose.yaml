@@ -1,6 +1,6 @@
 services:
   # --- 統合Appサーバー (Apache + Scheduler + Worker) ---
-  # Dockerfileで統合した apache_env ステージを使用し、全プロセスをこの1台で管理します。
+  # Dockerfileで統合した apache_env ステージを使用し、全プロセスをこの1台で管理
   app:
     container_name: app
     build:
@@ -24,6 +24,8 @@ services:
     depends_on:
       db:
         condition: service_healthy # DBが完全に準備できてからApp(Worker)を起動させる
+      redis:
+        condition: service_healthy # redisもhealthcheck付きで待機する
 
   # --- データベース (MySQL 8.4 LTS) ---
   db:
@@ -40,8 +42,8 @@ services:
       - ./docker/db/init:/docker-entrypoint-initdb.d
       - db_data:/var/lib/mysql
     healthcheck:
-      # MySQLがクエリを受け付けられる状態かチェック
-      # これにより、Appコンテナ起動時の「DB接続待ちエラー」を防止します
+      # appサービスの depends_on: condition: service_healthy で参照するため
+      # これによりAppコンテナ起動時の「DB接続待ちエラー」を防止
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}"]
       interval: 5s
       timeout: 5s
@@ -56,6 +58,13 @@ services:
       - "${REDIS_PORT:-6379}:6379"
     volumes:
       - redis_data:/data
+    # appサービスの depends_on: condition: service_healthy で参照するため
+    # これによりredis-cli ping が "PONG" を返せばコンテナが準備完了と判定
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   # --- メールテスト (Mailpit) ---
   # 開発中に送信されるメールをキャッチしてブラウザで確認可能にします
