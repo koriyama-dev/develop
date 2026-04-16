@@ -20,7 +20,7 @@ services:
       - XDEBUG_CONFIG=client_port=9003
     # WSL2環境でWindowsホスト側のデバッガ(VSCode等)と通信するための設定
     extra_hosts:
-      - "${XDEBUG_CLIENT_HOST:-host.docker.internal}:host-gateway"
+      - "host.docker.internal:host-gateway"
     depends_on:
       db:
         condition: service_healthy # DBが完全に準備できてからApp(Worker)を起動させる
@@ -43,7 +43,7 @@ services:
       # MySQLがクエリを受け付けられる状態かチェック
       # これにより、Appコンテナ起動時の「DB接続待ちエラー」を防止します
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}"]
-      interval: 10s
+      interval: 5s
       timeout: 5s
       retries: 5
 
