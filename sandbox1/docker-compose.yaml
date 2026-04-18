@@ -6,26 +6,31 @@ services:
     build:
       context: .
       dockerfile: ./docker/php/Dockerfile
-      target: apache_env # 統合されたステージを指定（SupervisorがPID 1として動作）
+      # 統合されたステージを指定（SupervisorがPID 1として動作）
+      target: apache_env
     ports:
-      - "${APP_PORT:-80}:80"      # HTTP
-      - "${APP_SSL_PORT:-443}:443" # HTTPS
+      - "${APP_PORT:-80}:80"
+      - "${APP_SSL_PORT:-443}:443"
     volumes:
       # ホストの ./src ディレクトリをコンテナの /var/www/html に同期
       - ./src:/var/www/html
     environment:
-      - TZ=Asia/Tokyo
+      - TZ=${TZ:-Asia/Tokyo}
       - APP_TIMEZONE=${APP_TIMEZONE:-Asia/Tokyo}
       - XDEBUG_MODE=${XDEBUG_MODE:-off}
-      - XDEBUG_CONFIG=client_port=9003
+      - XDEBUG_CONFIG=client_port=${XDEBUG_CLIENT_PORT:-9003}
     # WSL2環境でWindowsホスト側のデバッガ(VSCode等)と通信するための設定
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
       db:
-        condition: service_healthy # DBが完全に準備できてからApp(Worker)を起動させる
+        condition: service_healthy # DBが完全に準備できてからappを起動させる
       redis:
         condition: service_healthy # redisもhealthcheck付きで待機する
+      mailpit:
+        condition: service_healthy # mailpitもhealthcheck付きで待機する
+    networks:
+      - app_network
 
   # --- データベース (MySQL 8.4 LTS) ---
   db:
@@ -42,12 +47,12 @@ services:
       - ./docker/db/init:/docker-entrypoint-initdb.d
       - db_data:/var/lib/mysql
     healthcheck:
-      # appサービスの depends_on: condition: service_healthy で参照するため
-      # これによりAppコンテナ起動時の「DB接続待ちエラー」を防止
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}"]
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p'${DB_ROOT_PASSWORD}' --silent"]
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - app_network
 
   # --- メモリデータベース (Redis 7) ---
   redis:
@@ -58,29 +63,40 @@ services:
       - "${REDIS_PORT:-6379}:6379"
     volumes:
       - redis_data:/data
-    # appサービスの depends_on: condition: service_healthy で参照するため
-    # これによりredis-cli ping が "PONG" を返せばコンテナが準備完了と判定
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - app_network
 
   # --- メールテスト (Mailpit) ---
-  # 開発中に送信されるメールをキャッチしてブラウザで確認可能にします
   mailpit:
     container_name: mailpit
     image: axllent/mailpit:latest
     ports:
-      - "${MAIL_PORT:-1025}:1025"      # SMTPポート
+      - "${MAIL_PORT:-1025}:1025" # SMTPポート
       - "${MAIL_DASHBOARD_PORT:-8025}:8025" # 管理画面 (http://localhost:8025)
     environment:
       - TZ=${TZ:-Asia/Tokyo}
     volumes:
       - mailpit_data:/data
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8025"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app_network
 
 # データの永続化設定（コンテナを消しても残る）
 volumes:
-  db_data:      # MySQLのデータ
+  db_data: # MySQLのデータ
   mailpit_data: # メールの履歴データ
-  redis_data:   # redisのデータ
+  redis_data: # redisのデータ
+
+# デフォルトネットワーク依存から明示的にネットワークを定義
+networks:
+  app_network:
+    driver: bridge

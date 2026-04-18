@@ -4,8 +4,6 @@
 FROM node:22-slim AS node_lib
 FROM php:8.5-apache AS base
 
-ENV TZ=Asia/Tokyo
-
 # WSL2(Ubuntu)の一般ユーザーUID/GID(通常1000)に合わせる
 ARG USER_ID=1000
 ARG GROUP_ID=1000
@@ -37,6 +35,8 @@ COPY --from=node_lib /usr/local/bin /usr/local/bin
 COPY --from=node_lib /usr/local/lib/node_modules /usr/local/lib/node_modules
 # npm のエントリーポイントを明示的にシンボリックリンク
 RUN ln -sf /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm
+# npx のシンボリックリンク
+RUN ln -sf /usr/local/lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx
 
 # Composer (最新版) の配置
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -69,9 +69,9 @@ RUN a2enmod rewrite ssl headers && a2ensite default-ssl
 
 # Supervisorの設定
 # Apache, Worker, Scheduler の起動定義
-COPY ./docker/php/worker.conf /etc/supervisor/conf.d/worker.conf
+COPY ./docker/php/worker.conf /etc/supervisor/supervisord.conf
 
 # メインプロセスの指定
 # Apache単体ではなく、Supervisorをコンテナの主役(PID 1)として起動
 # これでSupervisorが管理する全プロセスのログが docker logs に集約
-CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/worker.conf"]
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
