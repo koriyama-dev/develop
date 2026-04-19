@@ -19,9 +19,7 @@ services:
       - APP_TIMEZONE=${APP_TIMEZONE:-Asia/Tokyo}
       - XDEBUG_MODE=${XDEBUG_MODE:-off}
       - XDEBUG_CONFIG=client_port=${XDEBUG_CLIENT_PORT:-9003}
-    # WSL2環境でWindowsホスト側のデバッガ(VSCode等)と通信するための設定
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    stop_grace_period: 3600s # コンテナ停止時の猶予時間を設定
     depends_on:
       db:
         condition: service_healthy # DBが完全に準備できてからappを起動させる
