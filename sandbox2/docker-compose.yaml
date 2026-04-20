@@ -51,15 +51,15 @@ services:
       start_period: 30s
     # worker.conf の stopwaitsecs=3600 に合わせて Graceful Shutdown を待機
     stop_grace_period: 3600s
-    security_opt:
-      - no-new-privileges:true
     depends_on:
       db:
         condition: service_healthy
-      cache:
+      redis:
         condition: service_healthy
       mailpit:
         condition: service_healthy
+    security_opt:
+      - no-new-privileges:true
     restart: unless-stopped
     networks:
       - app_network
@@ -67,7 +67,6 @@ services:
   # ----- データベース (MySQL 8.4 LTS) -----
   db:
     container_name: db
-    # mysql:8.4 = LTS タグ (2026年4月現在 8.4.8、EOL 2032年4月)
     image: mysql:8.4
     environment:
       - TZ=${TZ:-Asia/Tokyo}
@@ -80,7 +79,7 @@ services:
       - ./docker/db/init:/docker-entrypoint-initdb.d:ro
       - db_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p\"${DB_ROOT_PASSWORD}\" --silent"]
+      test: ["CMD-SHELL", "MYSQL_PWD=${DB_ROOT_PASSWORD} mysqladmin ping -h localhost -u root --silent"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -93,18 +92,15 @@ services:
       - app_network
 
   # ----- キャッシュ (Valkey 8 alpine) -----
-  cache:
-    container_name: cache
-    # Valkey = Redis 7.2.4 フォーク、BSD 3-Clause ライセンス、Linux Foundation 管理
-    # Redis 8 は AGPLv3/RSALv2/SSPL トリプルライセンスのため商用・OSS 両用途で Valkey を推奨
-    # Redis クライアント (predis/phpredis) はプロトコル互換のためそのまま使用可能
+  redis:
+    container_name: redis
     image: valkey/valkey:8-alpine
     # appendonly で AOF 永続化を有効化 (コンテナ再起動時のデータ消失を防ぐ)
     command: valkey-server --appendonly yes
     ports:
       - "${REDIS_PORT:-6379}:6379"
     volumes:
-      - cache_data:/data
+      - redis_data:/data
     healthcheck:
       test: ["CMD", "valkey-cli", "ping"]
       interval: 5s
@@ -149,7 +145,7 @@ services:
 volumes:
   db_data:
   mailpit_data:
-  cache_data:
+  redis_data:
 
 #==============================================================================
 # ネットワーク定義

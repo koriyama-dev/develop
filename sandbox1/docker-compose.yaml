@@ -31,11 +31,13 @@ services:
         condition: service_healthy
       mailpit:
         condition: service_healthy
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
     networks:
       - app_network
 
   # ----- データベース (MySQL 8.4 LTS) -----
-  # MySQL 8.4 LTS: 2026年4月時点の現行 LTS / MySQL 8.0 は同月 EOL 到達済み
   db:
     container_name: db
     image: mysql:8.4
@@ -46,53 +48,56 @@ services:
     ports:
       - "${DB_PORT:-3306}:3306"
     volumes:
-      - ./docker/db/my.cnf:/etc/mysql/conf.d/my.cnf
-      # コンテナ起動時の自動環境構築のための初期化スクリプト配置場所
-      - ./docker/db/init:/docker-entrypoint-initdb.d
+      - ./docker/db/my.cnf:/etc/mysql/conf.d/my.cnf:ro
+      - ./docker/db/init:/docker-entrypoint-initdb.d:ro
       - db_data:/var/lib/mysql
     healthcheck:
-      # $$ で変数をエスケープし Docker Compose による早期展開を回避 (コマンドライン平文埋め込みを防止するため MYSQL_PWD 環境変数経由で渡す)
       test: ["CMD-SHELL", "MYSQL_PWD=${DB_ROOT_PASSWORD} mysqladmin ping -h localhost -u root --silent"]
       interval: 5s
       timeout: 5s
       retries: 5
-      # MySQL の初期化完了を待つため最初のチェック開始を遅延させる
+      # 初回起動時のデータ初期化中は healthcheck が失敗するため猶予を設ける
       start_period: 30s
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
     networks:
       - app_network
 
-  # ----- キャッシュ (Redis 7.2) -----
-  # Redis 7.2: BSDv3 ライセンス最終版 (7.4 以降は RSALv2/SSPL に変更)
-  # バージョンを 7.2 に明示固定しライセンス変更の影響を受けないようにする
+  # ----- キャッシュ (Valkey 8 alpine) -----
   redis:
     container_name: redis
-    image: redis:7.2-alpine
-    # コンテナ再起動時のデータ消失を防止するため AOF モードを有効化
-    command: redis-server --appendonly yes
+    image: valkey/valkey:8-alpine
+    # appendonly で AOF 永続化を有効化 (コンテナ再起動時のデータ消失を防ぐ)
+    command: valkey-server --appendonly yes
     ports:
       - "${REDIS_PORT:-6379}:6379"
     volumes:
       - redis_data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "valkey-cli", "ping"]
       interval: 5s
       timeout: 5s
       retries: 5
+      # 起動直後の ping 失敗を正常な起動時間として猶予を設ける
       start_period: 10s
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
     networks:
       - app_network
 
   # ----- メールテスト (Mailpit) -----
-  # v1.29: 2026年4月時点の最新安定版 / v1.29.2 で CVE-2026-27808 (SSRF) 修正済み
   mailpit:
     container_name: mailpit
-    image: axllent/mailpit:v1.29
+    image: axllent/mailpit:latest
     ports:
       - "${MAIL_PORT:-1025}:1025"
-      # ブラウザ経由で送信メールを視覚的に確認するための管理画面ポート
       - "${MAIL_DASHBOARD_PORT:-8025}:8025"
     environment:
       - TZ=${TZ:-Asia/Tokyo}
+      # SQLite データファイルのパスを明示 (volume マウント先と一致させる)
+      - MP_DATA_FILE=/data/mailpit.db
     volumes:
       - mailpit_data:/data
     healthcheck:
@@ -101,14 +106,16 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
     networks:
       - app_network
 
 #==============================================================================
-# 永続化ボリューム定義
+# ボリューム定義
 #==============================================================================
 volumes:
-  # コンテナ破棄後もデータを永続化するための名前付きボリューム
   db_data:
   mailpit_data:
   redis_data:
@@ -117,6 +124,6 @@ volumes:
 # ネットワーク定義
 #==============================================================================
 networks:
-  # プロジェクト単位で通信空間を分離隔離するためのブリッジネットワーク
   app_network:
+    # bridge ドライバーで各コンテナを同一仮想ネットワーク内に配置
     driver: bridge
