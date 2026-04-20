@@ -35,7 +35,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # ----- PHP拡張機能 -----
 # Laravel 13 の動作要件を満たす拡張を一括導入
-# [本番環境] xdebug はパフォーマンス劣化の原因となるため本番イメージには含めないこと
 RUN install-php-extensions \
     bcmath \
     exif \
@@ -89,7 +88,6 @@ FROM base AS apache_env
 COPY ./docker/php/000-default.conf /etc/apache2/sites-available/000-default.conf
 
 # ----- SSL証明書 -----
-# [本番環境] 認証局発行の証明書に差し替えること (ここはローカル用の自己署名証明書)
 COPY ./docker/ssl/ssl.crt /etc/ssl/certs/ssl-cert-snakeoil.pem
 COPY ./docker/ssl/ssl.key /etc/ssl/private/ssl-cert-snakeoil.key
 

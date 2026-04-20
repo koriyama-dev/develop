@@ -35,7 +35,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # ----- PHP拡張機能 -----
 # Laravel 13 の動作要件を満たす拡張を一括導入
-# [本番環境] xdebug はパフォーマンス劣化の原因となるため本番イメージには含めないこと
 RUN install-php-extensions \
     bcmath \
     exif \

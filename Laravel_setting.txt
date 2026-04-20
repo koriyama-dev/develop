@@ -69,6 +69,8 @@ MAIL_PORT=1025 # Dockerコンテナポートを指定
     "php": "^8.5",
 },
 
+※docker-compose.yaml 配下で実行
+
 # migration実行
 $ docker compose exec app php artisan migrate
 
@@ -95,6 +97,8 @@ $ docker compose exec app chown -R www-data:www-data /var/www/html
 ************************************
 Laravel 疎通確認
 ************************************
+
+※docker-compose.yaml 配下で実行
 
 # DB
 $ docker compose exec app php artisan tinker
