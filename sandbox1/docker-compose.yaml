@@ -1,36 +1,40 @@
+#==============================================================================
+# サービス定義
+#==============================================================================
 services:
-  # --- 統合Appサーバー (Apache + Scheduler + Worker) ---
-  # Dockerfileで統合した apache_env ステージを使用し、全プロセスをこの1台で管理
+
+  # ----- 統合Appサーバー (Apache + Scheduler + Worker) -----
   app:
     container_name: app
     build:
       context: .
       dockerfile: ./docker/php/Dockerfile
-      # 統合されたステージを指定（SupervisorがPID 1として動作）
+      # 統合ステージを指定 (Supervisorによる複数プロセスの一元管理のため)
       target: apache_env
     ports:
       - "${APP_PORT:-80}:80"
       - "${APP_SSL_PORT:-443}:443"
     volumes:
-      # ホストの ./src ディレクトリをコンテナの /var/www/html に同期
       - ./src:/var/www/html
     environment:
       - TZ=${TZ:-Asia/Tokyo}
       - APP_TIMEZONE=${APP_TIMEZONE:-Asia/Tokyo}
       - XDEBUG_MODE=${XDEBUG_MODE:-off}
       - XDEBUG_CONFIG=client_port=${XDEBUG_CLIENT_PORT:-9003}
-    stop_grace_period: 3600s # コンテナ停止時の猶予時間を設定
+    # 終了猶予を1時間に設定 (実行中のジョブやワーカーを安全に停止させるため)
+    stop_grace_period: 3600s
     depends_on:
       db:
-        condition: service_healthy # DBが完全に準備できてからappを起動させる
+        # 完全な準備完了を待機 (起動直後の接続エラーを確実に防止するため)
+        condition: service_healthy
       redis:
-        condition: service_healthy # redisもhealthcheck付きで待機する
+        condition: service_healthy
       mailpit:
-        condition: service_healthy # mailpitもhealthcheck付きで待機する
+        condition: service_healthy
     networks:
       - app_network
 
-  # --- データベース (MySQL 8.4 LTS) ---
+  # ----- データベース (MySQL 8.4 LTS) -----
   db:
     container_name: db
     image: mysql:8.4
@@ -42,21 +46,24 @@ services:
       - "${DB_PORT:-3306}:3306"
     volumes:
       - ./docker/db/my.cnf:/etc/mysql/conf.d/my.cnf
+      # 初期化スクリプトを配置 (コンテナ起動時の自動環境構築のため)
       - ./docker/db/init:/docker-entrypoint-initdb.d
       - db_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p'${DB_ROOT_PASSWORD}' --silent"]
+      # パスワードを環境変数経由で渡す (コマンドライン引数への平文埋め込みを回避するため)
+      test: ["CMD-SHELL", "MYSQL_PWD=${DB_ROOT_PASSWORD} mysqladmin ping -h localhost -u root --silent"]
       interval: 5s
       timeout: 5s
       retries: 5
     networks:
       - app_network
 
-  # --- メモリデータベース (Redis 7) ---
+  # ----- キャッシュ (Redis 7) -----
   redis:
-    image: redis:7-alpine
     container_name: redis
-    command: redis-server --appendonly yes # データの永続化を有効化
+    image: redis:7-alpine
+    # AOFモードを有効化 (コンテナ再起動時のデータ消失を防止するため)
+    command: redis-server --appendonly yes
     ports:
       - "${REDIS_PORT:-6379}:6379"
     volumes:
@@ -69,13 +76,15 @@ services:
     networks:
       - app_network
 
-  # --- メールテスト (Mailpit) ---
+  # ----- メールテスト (Mailpit) -----
   mailpit:
     container_name: mailpit
-    image: axllent/mailpit:latest
+    # バージョンを固定 (意図しないbreaking changeによる動作不良を防止するため)
+    image: axllent/mailpit:v1.21
     ports:
-      - "${MAIL_PORT:-1025}:1025" # SMTPポート
-      - "${MAIL_DASHBOARD_PORT:-8025}:8025" # 管理画面 (http://localhost:8025)
+      - "${MAIL_PORT:-1025}:1025"
+      # 管理画面ポートを開放 (ブラウザ経由で送信メールを視覚的に確認するため)
+      - "${MAIL_DASHBOARD_PORT:-8025}:8025"
     environment:
       - TZ=${TZ:-Asia/Tokyo}
     volumes:
@@ -88,13 +97,19 @@ services:
     networks:
       - app_network
 
-# データの永続化設定（コンテナを消しても残る）
+#==============================================================================
+# 永続化ボリューム定義
+#==============================================================================
 volumes:
-  db_data: # MySQLのデータ
-  mailpit_data: # メールの履歴データ
-  redis_data: # redisのデータ
+  # 名前付きボリュームを定義 (コンテナ破棄後もデータを永続化させるため)
+  db_data:
+  mailpit_data:
+  redis_data:
 
-# デフォルトネットワーク依存から明示的にネットワークを定義
+#==============================================================================
+# ネットワーク定義
+#==============================================================================
 networks:
   app_network:
+    # ブリッジドライバを明示 (プロジェクト単位で通信空間を分離隔離するため)
     driver: bridge
