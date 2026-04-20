@@ -9,7 +9,7 @@ services:
     build:
       context: .
       dockerfile: ./docker/php/Dockerfile
-      # 統合ステージを指定 (Supervisorによる複数プロセスの一元管理のため)
+      # Supervisor による複数プロセスの一元管理を行う統合ステージを指定
       target: apache_env
     ports:
       - "${APP_PORT:-80}:80"
@@ -21,11 +21,11 @@ services:
       - APP_TIMEZONE=${APP_TIMEZONE:-Asia/Tokyo}
       - XDEBUG_MODE=${XDEBUG_MODE:-off}
       - XDEBUG_CONFIG=client_port=${XDEBUG_CLIENT_PORT:-9003}
-    # 終了猶予を1時間に設定 (実行中のジョブやワーカーを安全に停止させるため)
+    # 実行中のジョブやワーカーを安全に停止させるため猶予を 1 時間に設定
     stop_grace_period: 3600s
     depends_on:
       db:
-        # 完全な準備完了を待機 (起動直後の接続エラーを確実に防止するため)
+        # 起動直後の接続エラーを確実に防止するため完全な準備完了を待機
         condition: service_healthy
       redis:
         condition: service_healthy
@@ -35,6 +35,7 @@ services:
       - app_network
 
   # ----- データベース (MySQL 8.4 LTS) -----
+  # MySQL 8.4 LTS: 2026年4月時点の現行 LTS / MySQL 8.0 は同月 EOL 到達済み
   db:
     container_name: db
     image: mysql:8.4
@@ -46,23 +47,27 @@ services:
       - "${DB_PORT:-3306}:3306"
     volumes:
       - ./docker/db/my.cnf:/etc/mysql/conf.d/my.cnf
-      # 初期化スクリプトを配置 (コンテナ起動時の自動環境構築のため)
+      # コンテナ起動時の自動環境構築のための初期化スクリプト配置場所
       - ./docker/db/init:/docker-entrypoint-initdb.d
       - db_data:/var/lib/mysql
     healthcheck:
-      # パスワードを環境変数経由で渡す (コマンドライン引数への平文埋め込みを回避するため)
+      # $$ で変数をエスケープし Docker Compose による早期展開を回避 (コマンドライン平文埋め込みを防止するため MYSQL_PWD 環境変数経由で渡す)
       test: ["CMD-SHELL", "MYSQL_PWD=${DB_ROOT_PASSWORD} mysqladmin ping -h localhost -u root --silent"]
       interval: 5s
       timeout: 5s
       retries: 5
+      # MySQL の初期化完了を待つため最初のチェック開始を遅延させる
+      start_period: 30s
     networks:
       - app_network
 
-  # ----- キャッシュ (Redis 7) -----
+  # ----- キャッシュ (Redis 7.2) -----
+  # Redis 7.2: BSDv3 ライセンス最終版 (7.4 以降は RSALv2/SSPL に変更)
+  # バージョンを 7.2 に明示固定しライセンス変更の影響を受けないようにする
   redis:
     container_name: redis
-    image: redis:7-alpine
-    # AOFモードを有効化 (コンテナ再起動時のデータ消失を防止するため)
+    image: redis:7.2-alpine
+    # コンテナ再起動時のデータ消失を防止するため AOF モードを有効化
     command: redis-server --appendonly yes
     ports:
       - "${REDIS_PORT:-6379}:6379"
@@ -73,17 +78,18 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+      start_period: 10s
     networks:
       - app_network
 
   # ----- メールテスト (Mailpit) -----
+  # v1.29: 2026年4月時点の最新安定版 / v1.29.2 で CVE-2026-27808 (SSRF) 修正済み
   mailpit:
     container_name: mailpit
-    # バージョンを固定 (意図しないbreaking changeによる動作不良を防止するため)
-    image: axllent/mailpit:v1.21
+    image: axllent/mailpit:v1.29
     ports:
       - "${MAIL_PORT:-1025}:1025"
-      # 管理画面ポートを開放 (ブラウザ経由で送信メールを視覚的に確認するため)
+      # ブラウザ経由で送信メールを視覚的に確認するための管理画面ポート
       - "${MAIL_DASHBOARD_PORT:-8025}:8025"
     environment:
       - TZ=${TZ:-Asia/Tokyo}
@@ -94,6 +100,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+      start_period: 10s
     networks:
       - app_network
 
@@ -101,7 +108,7 @@ services:
 # 永続化ボリューム定義
 #==============================================================================
 volumes:
-  # 名前付きボリュームを定義 (コンテナ破棄後もデータを永続化させるため)
+  # コンテナ破棄後もデータを永続化するための名前付きボリューム
   db_data:
   mailpit_data:
   redis_data:
@@ -110,6 +117,6 @@ volumes:
 # ネットワーク定義
 #==============================================================================
 networks:
+  # プロジェクト単位で通信空間を分離隔離するためのブリッジネットワーク
   app_network:
-    # ブリッジドライバを明示 (プロジェクト単位で通信空間を分離隔離するため)
     driver: bridge

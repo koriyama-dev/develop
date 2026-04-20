@@ -1,7 +1,7 @@
 #==============================================================================
 # ステージ1: Node.js バイナリ取得用 (マルチステージビルド)
 #==============================================================================
-# node:24-slim: 2026年4月現在のActive LTS(Node 22はMaintenance LTSに降格)
+# node:24-slim: 2026年4月現在の Active LTS (Node 22 は Maintenance LTS に降格)
 FROM node:24-slim AS node_lib
 
 #==============================================================================
@@ -10,16 +10,16 @@ FROM node:24-slim AS node_lib
 FROM php:8.5-fpm AS base
 
 # ----- ビルド引数 -----
-# WSL2(Ubuntu)の一般ユーザーUID/GIDに合わせてwww-dataを同期(パーミッション問題を防ぐ)
+# WSL2 (Ubuntu) の一般ユーザー UID/GID に合わせて www-data を同期 (パーミッション問題を防ぐ)
 ARG USER_ID=1000
 ARG GROUP_ID=1000
 
-# ----- PHPエクステンションインストーラー -----
-# mlocati/php-extension-installerで依存解決を自動化
+# ----- PHP エクステンションインストーラー -----
+# mlocati/php-extension-installer で依存解決を自動化
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
 # ----- システムパッケージ -----
-# --no-install-recommendsで不要パッケージを排除してイメージサイズを削減
+# --no-install-recommends で不要パッケージを排除してイメージサイズを削減
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     gnupg \
@@ -36,13 +36,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # ----- PHP 拡張機能 -----
 # Laravel 13 + PHP 8.5 に必要な拡張をインストール
+# redis 拡張は Valkey (Redis プロトコル互換) にそのまま使用可能
 RUN install-php-extensions pdo_mysql gd bcmath intl exif zip opcache xdebug redis pcntl
 
 # ----- PHP 設定ファイル -----
 COPY ./docker/php/php.ini /usr/local/etc/php/conf.d/php.ini
 
 # ----- Node.js (Active LTS) -----
-# PHPコンテナにNode.jsをコピー(Vite等のフロントエンドビルドツール用)
+# PHP コンテナに Node.js をコピー (Vite 等のフロントエンドビルドツール用)
 COPY --from=node_lib /usr/local/bin  /usr/local/bin
 COPY --from=node_lib /usr/local/lib/node_modules /usr/local/lib/node_modules
 COPY --from=node_lib /usr/local/include /usr/local/include
@@ -50,11 +51,11 @@ RUN ln -sf /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
     && ln -sf /usr/local/lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx
 
 # ----- Composer -----
-# composerはPHPの依存管理ツール(latestで常に最新安定版を取得)
+# composer は PHP の依存管理ツール (latest で常に最新安定版を取得)
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # ----- ユーザー権限設定 -----
-# www-dataのUID/GIDをホスト(WSL2)側に合わせてボリュームマウント時のパーミッション競合を防ぐ
+# www-data の UID/GID をホスト (WSL2) 側に合わせてボリュームマウント時のパーミッション競合を防ぐ
 RUN usermod -u ${USER_ID} www-data \
     && groupmod -g ${GROUP_ID} www-data \
     && chsh -s /bin/bash www-data
@@ -76,8 +77,8 @@ FROM base AS app_env
 # PHP-FPM / Worker / Scheduler を一元管理
 COPY ./docker/php/worker.conf /etc/supervisor/supervisord.conf
 
-# PHP-FPMのデフォルトポート
+# PHP-FPM のデフォルトポート
 EXPOSE 9000
 
-# SupervisorをPID1として起動し全プロセスを管理
+# Supervisor を PID1 として起動し全プロセスを管理
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
