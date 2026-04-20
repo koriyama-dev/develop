@@ -1,17 +1,15 @@
 #==============================================================================
 # Node.js ライブラリ抽出ステージ
 #==============================================================================
-# Node.js 22 LTS (2026年4月時点のアクティブLTS) からバイナリのみ転送
-FROM node:22-slim AS node_lib
+FROM node:24-slim AS node_lib
 
 #==============================================================================
 # 共通ベースイメージ (PHP 8.5 + Apache)
 #==============================================================================
-# PHP 8.5 は 2026年4月時点の最新安定版 (Laravel 13 最低要件: PHP 8.3以上)
 FROM php:8.5-apache AS base
 
 # ----- ビルド引数 -----
-# WSL2 一般ユーザーの UID/GID (通常1000) に合わせてホストとのファイル権限を同期
+# WSL2 (Ubuntu) の一般ユーザー UID/GID に合わせて www-data を同期 (パーミッション問題を防ぐ)
 ARG USER_ID=1000
 ARG GROUP_ID=1000
 
@@ -20,17 +18,18 @@ ARG GROUP_ID=1000
 COPY --from=ghcr.io/mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
 # ----- システムパッケージ -----
-# 開発・運用に必須のパッケージを一括導入しキャッシュをクリーンアップしてレイヤーを最小化
+# --no-install-recommends で不要パッケージを排除してイメージサイズを削減
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    coreutils \
     git \
     gnupg \
     locales \
+    netcat-openbsd \
     supervisor \
-    tzdata \
     unzip \
     vim \
     zip \
+    tzdata \
+    coreutils \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -49,15 +48,14 @@ RUN install-php-extensions \
     xdebug \
     zip
 
-# ----- PHP設定 -----
+# ----- PHP 設定 -----
 COPY ./docker/php/php.ini /usr/local/etc/php/php.ini
 
-# ----- Node.js (フロントエンドビルド用) -----
-# バイナリのみ選択転送し不要ファイルとの競合を避けてイメージを軽量化
-COPY --from=node_lib /usr/local/bin/node /usr/local/bin/node
+# ----- Node.js (Active LTS) -----
+# PHP コンテナに Node.js をコピー (Vite 等のフロントエンドビルドツール用)
+COPY --from=node_lib /usr/local/bin  /usr/local/bin
 COPY --from=node_lib /usr/local/lib/node_modules /usr/local/lib/node_modules
-
-# npm / npx のシンボリックリンクを作成しコンテナ内でフロントエンドビルドを可能にする
+COPY --from=node_lib /usr/local/include /usr/local/include
 RUN ln -sf /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
     && ln -sf /usr/local/lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx
 
@@ -65,13 +63,12 @@ RUN ln -sf /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
 # メジャーバージョン 2 系に固定し breaking change の混入を防止
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# ----- タイムゾーン -----
-# ログ出力や日付処理の不整合を防ぐためシステムを日本標準時に固定
+# ----- タイムゾーン設定 -----
 RUN ln -sf /usr/share/zoneinfo/Asia/Tokyo /etc/localtime \
     && echo "Asia/Tokyo" > /etc/timezone
 
-# ----- ユーザー権限同期 -----
-# www-data の UID/GID をホストと同期し WSL2 環境でのファイル書き込み権限エラーを解消
+# ----- ユーザー権限設定 -----
+# www-data の UID/GID をホスト (WSL2) 側に合わせてボリュームマウント時のパーミッション競合を防ぐ
 RUN usermod -u ${USER_ID} www-data \
     && groupmod -g ${GROUP_ID} www-data \
     && chsh -s /bin/bash www-data

@@ -1,11 +1,10 @@
 #==============================================================================
-# ステージ1: Node.js バイナリ取得用 (マルチステージビルド)
+# Node.js ライブラリ抽出ステージ
 #==============================================================================
-# node:24-slim: 2026年4月現在の Active LTS (Node 22 は Maintenance LTS に降格)
 FROM node:24-slim AS node_lib
 
 #==============================================================================
-# ステージ2: PHP 8.5 ベースイメージ
+# 共通ベースイメージ (PHP 8.5)
 #==============================================================================
 FROM php:8.5-fpm AS base
 
@@ -14,9 +13,9 @@ FROM php:8.5-fpm AS base
 ARG USER_ID=1000
 ARG GROUP_ID=1000
 
-# ----- PHP エクステンションインストーラー -----
-# mlocati/php-extension-installer で依存解決を自動化
-COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+# ----- PHP拡張インストーラ -----
+# ghcr.io 経由が推奨記法 (Docker Hub レート制限を回避し最新版を確実に取得するため)
+COPY --from=ghcr.io/mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
 # ----- システムパッケージ -----
 # --no-install-recommends で不要パッケージを排除してイメージサイズを削減
@@ -34,12 +33,22 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# ----- PHP 拡張機能 -----
-# Laravel 13 + PHP 8.5 に必要な拡張をインストール
-# redis 拡張は Valkey (Redis プロトコル互換) にそのまま使用可能
-RUN install-php-extensions pdo_mysql gd bcmath intl exif zip opcache xdebug redis pcntl
+# ----- PHP拡張機能 -----
+# Laravel 13 の動作要件を満たす拡張を一括導入
+# [本番環境] xdebug はパフォーマンス劣化の原因となるため本番イメージには含めないこと
+RUN install-php-extensions \
+    bcmath \
+    exif \
+    gd \
+    intl \
+    opcache \
+    pcntl \
+    pdo_mysql \
+    redis \
+    xdebug \
+    zip
 
-# ----- PHP 設定ファイル -----
+# ----- PHP 設定 -----
 COPY ./docker/php/php.ini /usr/local/etc/php/conf.d/php.ini
 
 # ----- Node.js (Active LTS) -----
@@ -51,8 +60,12 @@ RUN ln -sf /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
     && ln -sf /usr/local/lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx
 
 # ----- Composer -----
-# composer は PHP の依存管理ツール (latest で常に最新安定版を取得)
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# メジャーバージョン 2 系に固定し breaking change の混入を防止
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+# ----- タイムゾーン設定 -----
+RUN ln -sf /usr/share/zoneinfo/Asia/Tokyo /etc/localtime \
+    && echo "Asia/Tokyo" > /etc/timezone
 
 # ----- ユーザー権限設定 -----
 # www-data の UID/GID をホスト (WSL2) 側に合わせてボリュームマウント時のパーミッション競合を防ぐ
@@ -60,13 +73,12 @@ RUN usermod -u ${USER_ID} www-data \
     && groupmod -g ${GROUP_ID} www-data \
     && chsh -s /bin/bash www-data
 
-# ----- タイムゾーン設定 -----
-RUN ln -sf /usr/share/zoneinfo/Asia/Tokyo /etc/localtime \
-    && echo "Asia/Tokyo" > /etc/timezone
-
 # ----- 作業ディレクトリ -----
+# アプリケーションディレクトリの所有権を設定し実行時のパーミッションエラーを回避
+RUN chown www-data:www-data /var/www \
+    && chown -R www-data:www-data /var/www/html
+
 WORKDIR /var/www/html
-RUN chown -R www-data:www-data /var/www
 
 #==============================================================================
 # ステージ3: 実行ステージ (PHP-FPM + Supervisor)

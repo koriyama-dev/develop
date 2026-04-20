@@ -49,8 +49,8 @@ services:
       retries: 10
       # Supervisor による各プロセス起動完了を待つため start_period を長めに設定
       start_period: 30s
-    # worker.conf の stopwaitsecs=3600 に合わせて Graceful Shutdown を待機
-    stop_grace_period: 3600s
+    # Dockerが強制終了するまでの猶予
+    stop_grace_period: 30s
     depends_on:
       db:
         condition: service_healthy

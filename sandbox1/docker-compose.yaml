@@ -21,8 +21,8 @@ services:
       - APP_TIMEZONE=${APP_TIMEZONE:-Asia/Tokyo}
       - XDEBUG_MODE=${XDEBUG_MODE:-off}
       - XDEBUG_CONFIG=client_port=${XDEBUG_CLIENT_PORT:-9003}
-    # 実行中のジョブやワーカーを安全に停止させるため猶予を 1 時間に設定
-    stop_grace_period: 3600s
+    # Dockerが強制終了するまでの猶予
+    stop_grace_period: 10s
     depends_on:
       db:
         # 起動直後の接続エラーを確実に防止するため完全な準備完了を待機
@@ -97,7 +97,7 @@ services:
     environment:
       - TZ=${TZ:-Asia/Tokyo}
       # SQLite データファイルのパスを明示 (volume マウント先と一致させる)
-      - MP_DATA_FILE=/data/mailpit.db
+      - MP_DATABASE=/data/mailpit.db
     volumes:
       - mailpit_data:/data
     healthcheck:
