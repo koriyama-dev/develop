@@ -39,13 +39,7 @@
 ・ターミナルから「wsl」でログイン
 
 ・wslのフォルダを開く
-$ export SANDBOX_NAME=sandbox1
-code /home/developer/develop/src
-
-または
-
-$ export SANDBOX_NAME=sandbox2
-code /home/developer/develop/src
+$ bash /home/developer/develop/switch-sandbox.sh sandbox[1 or 2]
 
 ・ターミナルからコンテナ起動
 $ docker-compose up --build
@@ -63,13 +57,7 @@ DockerFileや設定ファイルの変更時：「Dev Containers: Rebuild Contain
 ・再度ターミナルから「wsl」でログイン
 
 ・再度wslのフォルダを開く
-$ export SANDBOX_NAME=sandbox1
-code /home/developer/develop/src
-
-または
-
-$ export SANDBOX_NAME=sandbox2
-code /home/developer/develop/src
+$ bash /home/developer/develop/switch-sandbox.sh sandbox[1 or 2]
 
 ****************************************
 ■Xdebug

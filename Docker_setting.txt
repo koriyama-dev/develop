@@ -54,7 +54,6 @@ https://docs.docker.com/desktop/install/windows-install/
 $ wsl
 
 # docker-composeファイルに移動
-$ cd /home/developer/develop/sandbox1
 
 # イメージビルド＋コンテナ起動
 $ docker compose up -d --build

@@ -3,22 +3,15 @@ Laravel(ver13)インストール
 PHP8.5＋MySQL8.4
 ****************************************
 
-# コンテナから実行
-
-# 移動
-$ cd /var/www/html
-
 # Laravelインストール
-$ composer create-project laravel/laravel --prefer-dist "13.*"
+$ docker compose exec -w /var/www/html app create-project laravel/laravel --prefer-dist "13.*"
 
 # npmインストール
-$ npm install
+$ docker compose exec -w /var/www/html app npm install
 
 # npm実行
-$ npm run dev
+$ docker compose exec -w /var/www/html app npm run dev
 # Ctrl+Cで終了
-
-# WSLから実行
 
 # WSLのIP確認
 $ wsl -e hostname -I
@@ -72,7 +65,7 @@ MAIL_PORT=1025 # Dockerコンテナポートを指定
 ※docker-compose.yaml 配下で実行
 
 # migration実行
-$ docker compose exec app php artisan migrate
+$ docker compose exec -w /var/www/html app php artisan migrate
 
 # ide-helperのインストール
 $ docker compose exec -w /var/www/html app composer require --dev barryvdh/laravel-ide-helper

@@ -1,6 +1,6 @@
 {
   "name": "base",
-  "dockerComposeFile": "../../${localEnv:SANDBOX_NAME:sandbox1}/docker-compose.yaml",
+  "dockerComposeFile": "../../sandbox1/docker-compose.yaml",
   "service": "app",
   "workspaceFolder": "/var/www/html",
   "remoteUser": "www-data",
