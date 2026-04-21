@@ -48,7 +48,7 @@ $ wsl --shutdown
 https://docs.docker.com/desktop/install/windows-install/
 
 # Docker Desktop起動
-# Settings→Resources→WSL integration→UbuntuをON
+# Settings ⇒ Resources ⇒ WSL integration ⇒ Ubuntuを「ON」
 
 # WSLログイン
 $ wsl
@@ -59,7 +59,7 @@ $ wsl
 $ docker compose up -d --build
 
 ****************************************
-■コマンド群
+■Dockerコマンド群
 ****************************************
 
 # イメージビルド＋コンテナ構築(コード変更時)
@@ -88,12 +88,12 @@ $ docker compose logs -f app | grep "\[SCHEDULER\]"
 $ docker compose logs -f app | grep "\[WORKER\]"
 
 ****************************************
-■コンテナ操作
+■VSCode使用時のコンテナ操作
 ****************************************
 
 ----- コンテナ起動 -----
 
-# 一旦コンテナを削除した上で新たにコンテナを構築しvscodeを開く
+# 一旦コンテナを削除した上で新たに対象コンテナを構築しvscodeを開く
 $ bash /home/developer/develop/switch-sandbox.sh sandbox[1 or 2]
 
 # vscode上で「Ctrl + Shift + P」でコマンドパレットから
@@ -104,7 +104,7 @@ $ bash /home/developer/develop/switch-sandbox.sh sandbox[1 or 2]
 $ bash /home/developer/develop/remove-all-sandboxes.sh
 
 ****************************************
-■Zone.Identifierファイル
+■WSL上のZone.Identifierファイル
 ****************************************
 # 一括削除
 $ find . -type f -name "*:Zone.Identifier" -delete
