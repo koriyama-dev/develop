@@ -16,8 +16,7 @@
         "ms-azuretools.vscode-containers",
         "bmewburn.vscode-intelephense-client",
         "xdebug.php-debug",
-        "cweijan.vscode-mysql-client2",
-        "Codeium.codeium"
+        "cweijan.vscode-mysql-client2"
       ]
     }
   }
