@@ -62,17 +62,20 @@ $ docker compose up -d --build
 ■コマンド群
 ****************************************
 
-# イメージビルド＋コンテナ起動
+# イメージビルド＋コンテナ構築(コード変更時)
 $ docker compose up -d --build
 
-# コンテナ起動
+# コンテナ構築
 $ docker compose up -d
+
+# コンテナ起動
+$ docker compose start
 
 # コンテナ停止
 $ docker compose stop
 
-# コンテナ再起動
-$ docker compose restart
+# コンテナ削除
+$ docker compose down
 
 # コンテナログイン
 $ docker compose exec app bash
@@ -83,6 +86,22 @@ $ docker compose logs -f app
 $ docker compose logs -f app | grep "\[APACHE\]"
 $ docker compose logs -f app | grep "\[SCHEDULER\]"
 $ docker compose logs -f app | grep "\[WORKER\]"
+
+****************************************
+■コンテナ操作
+****************************************
+
+----- コンテナ起動 -----
+
+# 一旦コンテナを削除した上で新たにコンテナを構築しvscodeを開く
+$ bash /home/developer/develop/switch-sandbox.sh sandbox[1 or 2]
+
+# vscode上で「Ctrl + Shift + P」でコマンドパレットから
+# 「Dev Containers: Rebuild Container」を選択
+
+----- コンテナ削除 -----
+
+$ bash /home/developer/develop/remove-all-sandboxes.sh
 
 ****************************************
 ■Zone.Identifierファイル
