@@ -27,7 +27,7 @@ services:
       db:
         # 起動直後の接続エラーを確実に防止するため完全な準備完了を待機
         condition: service_healthy
-      redis:
+      valkey:
         condition: service_healthy
       mailpit:
         condition: service_healthy
@@ -52,7 +52,16 @@ services:
       - ./docker/db/init:/docker-entrypoint-initdb.d:ro
       - db_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD-SHELL", "MYSQL_PWD=${DB_ROOT_PASSWORD} mysqladmin ping -h localhost -u root --silent"]
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h", "localhost",
+          "-u", "root",
+          "--password=${DB_ROOT_PASSWORD}",
+          "--silent",
+        ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -65,15 +74,15 @@ services:
       - app_network
 
   # ----- キャッシュ (Valkey 8 alpine) -----
-  redis:
-    container_name: redis-1
+  valkey:
+    container_name: valkey-1
     image: valkey/valkey:8-alpine
     # appendonly で AOF 永続化を有効化 (コンテナ再起動時のデータ消失を防ぐ)
     command: valkey-server --appendonly yes
     ports:
       - "${REDIS_PORT:-6379}:6379"
     volumes:
-      - redis_data:/data
+      - valkey_data:/data
     healthcheck:
       test: ["CMD", "valkey-cli", "ping"]
       interval: 5s
@@ -90,7 +99,7 @@ services:
   # ----- メールテスト (Mailpit) -----
   mailpit:
     container_name: mailpit-1
-    image: axllent/mailpit:latest
+    image: axllent/mailpit:v1.22
     ports:
       - "${MAIL_PORT:-1025}:1025"
       - "${MAIL_DASHBOARD_PORT:-8025}:8025"
@@ -101,7 +110,7 @@ services:
     volumes:
       - mailpit_data:/data
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8025"]
+      test: ["CMD", "/mailpit", "readyz"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -118,7 +127,7 @@ services:
 volumes:
   db_data:
   mailpit_data:
-  redis_data:
+  valkey_data:
 
 #==============================================================================
 # ネットワーク定義
