@@ -95,6 +95,7 @@
     ],
     "showAdminShield": false,
     "snapToGridOnResize": true,
+    "tabSwitcherMode": "disabled",
     "tabWidthMode": "equal",
     "themes": [],
     "trimBlockSelection": true,
@@ -102,6 +103,6 @@
     "warning.confirmCloseAllTabs": false,
     "warning.inputService": false,
     "warning.largePaste": false,
-    "warning.multiLinePaste": false,
+    "warning.multiLinePaste": "never",
     "windowingBehavior": "useNew"
 }

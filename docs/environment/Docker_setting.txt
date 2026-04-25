@@ -1,46 +1,4 @@
 ****************************************
-■WSLインストール
-****************************************
-
-# wslに必要なWindows機能の有効化、WSL2のインストール、最新のUbuntu(LTS)をインストール
-$ wsl --install
-
-# ユーザー作成
-Enter new UNIX username:
-> developer
-New password:
-> passwd
-
-# WSLログイン
-$ wsl
-
-# rootパスワード設定
-$ sudo passwd root
-[sudo] password for developer
-> passwd
-Enter new UNIX password:
-> passwd
-Retype new UNIX password:passwd
-> passwd
-
-# root昇格
-$ su root
-Password:
-> passwd
-
-# デフォルトユーザー変更
-$ vi /etc/wsl.conf
-
-# 追記
-[user]
-default=root
-
-# WSL再起動
-$ wsl --shutdown
-
-# エクスプローラーからのWSLパス：\\wsl.localhost\Ubuntu
-
-****************************************
 ■Dockerインストール
 ****************************************
 
@@ -102,9 +60,3 @@ $ bash /home/developer/develop/switch-sandbox.sh sandbox[1 or 2]
 ----- コンテナ削除 -----
 
 $ bash /home/developer/develop/remove-all-sandboxes.sh
-
-****************************************
-■WSL上のZone.Identifierファイル
-****************************************
-# 一括削除
-$ find . -type f -name "*:Zone.Identifier" -delete
