@@ -102,7 +102,7 @@ services:
   # ----- キャッシュ (Valkey 8 alpine) -----
   valkey:
     container_name: valkey-2
-    image: valkey/valkey:8-alpine
+    image: valkey/valkey:8.1-alpine
     # appendonly で AOF 永続化を有効化 (コンテナ再起動時のデータ消失を防ぐ)
     command: valkey-server --appendonly yes
     ports:
@@ -125,7 +125,7 @@ services:
   # ----- メールテスト (Mailpit) -----
   mailpit:
     container_name: mailpit-2
-    image: axllent/mailpit:v1.22
+    image: axllent/mailpit:v1.29
     ports:
       - "${MAIL_PORT:-1025}:1025"
       - "${MAIL_DASHBOARD_PORT:-8025}:8025"
