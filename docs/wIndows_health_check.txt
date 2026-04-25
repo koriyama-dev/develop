@@ -1,5 +1,3 @@
-■windowsターミナル
-
 # システムイメージ修復
 $ DISM /Online /Cleanup-image /Restorehealth
 
