@@ -1,3 +1,7 @@
 ■windowsターミナル
+
+# システムイメージ修復
 $ DISM /Online /Cleanup-image /Restorehealth
+
+# 個別のシステムファイル修復
 $ sfc /scannow

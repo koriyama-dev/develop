@@ -126,13 +126,3 @@ https://base.local/?XDEBUG_SESSION=1
 
 【CLI】
 $ XDEBUG_SESSION=1 php artisan migrate
-
-****************************************
-Laravel定期実行
-****************************************
-
-# 全てのキャッシュクリア
-$ php artisan optimize:clear
-
-# autoload生成
-$ composer dump-autoload

@@ -59,10 +59,3 @@ $ cat /etc/os-release
 
 # 一括削除
 $ find . -type f -name "*:Zone.Identifier" -delete
-
-****************************************
-WSL定期実行
-****************************************
-
-# パッケージ更新
-$ apt update && apt upgrade -y && apt dist-upgrade -y
