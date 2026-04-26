@@ -6,6 +6,8 @@ use Illuminate\View\View;
 use Illuminate\Http\Request;
 use App\Models\User;
 
+// ViewComposerServiceProvider に登録する
+
 class TestComposer
 {
 

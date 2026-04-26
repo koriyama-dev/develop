@@ -1,5 +1,5 @@
 # 1. Logic / Events / Queue
-# システムの中核となる振る舞いを分離する機能です。
+# システムの中核となる振る舞いを分離する機能
 
     app/Events
         コマンド: php artisan make:event [Name]
@@ -31,7 +31,7 @@
              「システムが勝手にやっておいてほしいこと」はオブザーバ、「エンジニアが意図的に実行したいこと」はService/Contr              oller、と分ける
 
 # 2. HTTP / API / Validation
-# リクエスト制御や入力チェックを行う機能です。
+# リクエスト制御や入力チェックを行う機能
 
     app/Http/Middleware
         コマンド: php artisan make:middleware [Name]
@@ -50,7 +50,7 @@
         用途: 独自のバリデーションルールの作成
 
 # 3. Mail / Notifications / UI
-# ユーザーへの出力や通知、画面部品を制御する機能です。
+# ユーザーへの出力や通知、画面部品を制御する機能
 
     app/Mail
         コマンド: php artisan make:mail [Name]
@@ -64,10 +64,10 @@
         コマンド: php artisan make:component [Name]
         用途: Bladeコンポーネントのロジック部分
               そのUIパーツを表示するために必要な『表示ロジック』を、HTML（Blade）から切り離して記述する場所
-              @php ... @endphp を多用すると可読性が落ちるため
+              また、view共通で使用したいロジックを記述
 
 # 4. Security / Customization
-# 高度なカスタマイズやセキュリティ設定を行う機能です。
+# 高度なカスタマイズやセキュリティ設定を行う機能
 
     app/Policies
         コマンド: php artisan make:policy [Name]
@@ -90,7 +90,7 @@
         用途: 独自の artisan コマンドを作成
 
 # 5. Manual Directories (Reference)
-# 公式コマンドはないが、慣習的に手動で作成されるディレクトリです。
+# 公式コマンドはないが、慣習的に手動で作成されるディレクトリ
 
     app/Services
         用途: コントローラに書けない複雑なビジネスロジック

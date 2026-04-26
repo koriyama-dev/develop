@@ -22,7 +22,7 @@ class TestException extends Exception
     }
 
     /**
-     * 例外をログに記録するロジック
+     * 例外をログに記録する
      */
     public function report(): void
     {
@@ -34,7 +34,7 @@ class TestException extends Exception
     }
 
     /**
-     * 例外をHTTPレスポンスに変換するロジック
+     * 例外をHTTPレスポンスに変換する
      */
     public function render(Request $request): JsonResponse
     {

@@ -35,8 +35,51 @@ class Test extends Model
     // Prunable: 一定期間を過ぎた不要データを自動削除する
     use HasFactory, SoftDeletes, Prunable;
 
+    /*************************
+     * 基本構成 (テーブル構造)
+     **************************/
+
     /**
-     * 一括代入を許可する属性 (ホワイトリスト)
+     * 使用するDB接続名
+     */
+    // protected $connection = 'mysql';
+
+    /**
+     * 対応するテーブル名
+     */
+    // protected $table = 'test';
+
+    /**
+     * 主キーのカラム名(デフォルト: id)
+     */
+    // protected $primaryKey = 'test_id';
+
+    /**
+     * 主キーのデータ型(デフォルト: int)
+     */
+    // protected $keyType = 'int';
+
+    /**
+     * 主キーが自動インクリメントか否か(デフォルト: true)
+     */
+    // public $incrementing = true;
+
+    /**
+     * created_at, updated_at の自動更新を行うか(デフォルト: true)
+     */
+    // public $timestamps = true;
+
+    /**
+     * 日付保存フォーマット(デフォルト: Y-m-d H:i:s)
+     */
+    // protected $dateFormat = 'Y-m-d H:i:s';
+
+    /*************************
+     * 複数代入 (セキュリティ)
+     **************************/
+
+    /**
+     * 一括代入を許可する属性(ホワイトリスト)
      * $test->fill($request->all())->save(); 等で利用
      */
     protected $fillable = [
@@ -48,19 +91,54 @@ class Test extends Model
     ];
 
     /**
-     * JSON/配列変換時に含めるアクセサ属性 (Property Hooks：ロジック加工)
+     * 保存禁止カラム(ブラックリスト)
      */
-    protected $appends = ['full_name'];
+     // protected $guarded = ['id', 'role'];
+
+    /*************************
+     * シリアライズ (JSON/配列変換)
+     **************************/
 
     /**
-     * JSON/配列変換時に隠蔽する属性 (機密情報)
+     * JSON/配列変換時に隠蔽する属性(ブラックリスト)
      */
     protected $hidden = ['password', 'token'];
 
     /**
+     * JSON/配列変換時に含める属性(ホワイトリスト)
+     */
+    protected $visible = ['name', 'email'];
+
+    /**
+     * JSON/配列変換時に含めるアクセサ属性 (Property Hooks：ロジック加工)
+     */
+    protected $appends = ['full_name'];
+
+    /*************************
+     * 型変換・リレーション制御
+     **************************/
+
+    protected $casts = []; // 型変換定義 (L13ではcasts()メソッド推奨)
+
+    /**
+     * 関連データ（リレーション先）を事前にまとめて取得する
+     */
+    // protected $with = ['profile'];
+
+    /**
+     * 常に件数を取得するリレーション
+     */
+    // protected $withCount = ['comments'];   // [修正] 常に件数を取得するリレーション
+
+    /**
+     * ページネーションのデフォルト件数
+     */
+    protected $perPage = 50;
+
+    /**
      * このモデルが更新された際、親モデルの updated_at も自動更新する
      */
-    protected $touches = ['user'];
+    // protected $touches = ['user'];
 
     /**************************
         キャスト設定(型変換)
@@ -76,24 +154,15 @@ class Test extends Model
     }
 
     /**************************
-        モデルイベント
-    **************************/
-    protected static function booted(): void
-    {
-        // 作成時の自動処理
-        static::creating(function (Model $test) {
-            $test->uuid = str()->uuid();
-        });
-
-        // 更新時の自動処理
-        static::updating(function (Model $test) {
-            $test->updated_at = now();
-        });
-    }
-
-    /**************************
         アクセサ(取り出す時に加工) / ミューテタ(保存する時に加工)：Property Hooks
     **************************/
+
+    // $this->age と $this->attributes['age']の使い分け
+    // $this->age               …アクセサやキャストが適用された後の値を返す
+    // $this->attributes['age'] …データベースから取得したままの生データを返す
+    // 基本的には $this->age を使用すべき
+    // $this->attributes を直接操作するのは、アクセサの中でそのカラム自体の生データを参照したい場合
+    // （そうしないとアクセサが自分自身を呼び出し続けて無限ループになるため）
 
     /**
      * age: 初期値を制御するアクセサとミューテタ
@@ -109,7 +178,23 @@ class Test extends Model
      * DBにカラムが存在しない仮想的なプロパティ
      */
     public string $full_name {
-        get => "{$this->first_name}{$this->last_name}";
+        get => $this->first_name . $this->last_name;
+    }
+
+    /**************************
+        モデルイベント
+    **************************/
+    protected static function booted(): void
+    {
+        // 作成時の自動処理
+        static::creating(function (Model $test) {
+            $test->uuid = str()->uuid();
+        });
+
+        // 更新時の自動処理
+        static::updating(function (Model $test) {
+            $test->test_at = now();
+        });
     }
 
     /**************************

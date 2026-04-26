@@ -17,6 +17,11 @@ class TestCommand extends Command
     protected $description = 'test-command description';
 
     /**
+     * 同一コマンドの二重起動を防止
+     */
+    protected $isolated = true;
+
+    /**
      * Execute the console command.
      */
     public function handle(): int
