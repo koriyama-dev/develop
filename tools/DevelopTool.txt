@@ -9,14 +9,14 @@ SumatraPDF
 7-Zip
 クリップNOTE
 ===== Dev Tool =======
-Windows Terminal ※管理者
-Git
-SourceTree
+Windows Terminal(管理者実行)
 WSL
-Docker Desktop for Windows
-Visual Studio Code
-DBeaver
-WinMerge
 RLogin
 WinSCP
+Git
+SourceTree
+Docker Desktop for Windows
+Visual Studio Code(System Installer)
+DBeaver
+WinMerge
 =====================
