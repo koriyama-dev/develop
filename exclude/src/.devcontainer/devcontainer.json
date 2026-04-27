@@ -1,0 +1,24 @@
+{
+  "name": "base",
+  "dockerComposeFile": "../../sandbox1/docker-compose.yaml",
+  "service": "app",
+  "workspaceFolder": "/var/www/html",
+  "remoteUser": "www-data",
+  "updateRemoteUserUID": true,
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "MS-CEINTL.vscode-language-pack-ja",
+        "vscode-icons-team.vscode-icons",
+        "ms-vscode-remote.remote-wsl",
+        "ms-azuretools.vscode-docker",
+        "ms-vscode-remote.remote-containers",
+        "ms-azuretools.vscode-containers",
+        "bmewburn.vscode-intelephense-client",
+        "xdebug.php-debug",
+        "cweijan.vscode-mysql-client2",
+        "Codeium.codeium"
+      ]
+    }
+  }
+}
