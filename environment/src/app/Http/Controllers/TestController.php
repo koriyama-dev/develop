@@ -10,9 +10,12 @@ use App\Jobs\TestJobs;
 use App\Mail\TestMail;
 use Illuminate\Support\Facades\Mail;
 use App\Exceptions\TestException;
+use App\Models\Test;
+use Illuminate\Support\Facades\Gate;
 
 class TestController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      */
@@ -22,6 +25,10 @@ class TestController extends Controller
         $user->name = "太郎";
         $user->email = $user->email = fake()->unique()->safeEmail();;
         $user->password = Hash::make('password123');
+
+        // ポリシーの認可
+        Gate::authorize('viewAny', [Test::class, 'test category']);
+
         // observer実行
         $user->save();
 
