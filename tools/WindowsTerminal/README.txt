@@ -1,2 +1,5 @@
-■場所
+*****************************
+場所
+*****************************
+
 C:\Users\[ユーザー]\AppData\Local\Microsoft\WindowsApps\wt.exe

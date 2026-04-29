@@ -1,4 +1,7 @@
-======== Tool =======
+*****************************
+tool
+*****************************
+
 Microsoft Edge( --inprivate)
 Google Chrome( --incognito)
 Excel
@@ -8,7 +11,11 @@ PowerPoint
 SumatraPDF
 7-Zip
 クリップNOTE
-===== Dev Tool =======
+
+*****************************
+dev tool
+*****************************
+
 Windows Terminal(管理者実行)
 WSL
 RLogin
@@ -19,4 +26,3 @@ Docker Desktop for Windows
 Visual Studio Code(System Installer)
 DBeaver
 WinMerge
-=====================
