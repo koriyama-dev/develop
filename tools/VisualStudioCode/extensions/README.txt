@@ -29,3 +29,5 @@
 ・MySQL
 
 ・Windsurf Plugin (formerly Codeium)
+
+・Cline

@@ -1,6 +1,6 @@
 {
   "name": "base",
-  "dockerComposeFile": "../../sandbox1/docker-compose.yaml",
+  "dockerComposeFile": "../../sandbox2/docker-compose.yaml",
   "service": "app",
   "workspaceFolder": "/var/www/html",
   "remoteUser": "www-data",
@@ -17,7 +17,8 @@
         "bmewburn.vscode-intelephense-client",
         "xdebug.php-debug",
         "cweijan.vscode-mysql-client2",
-        "Codeium.codeium"
+        "Codeium.codeium",
+        "saoudrizwan.claude-dev"
       ]
     }
   }
