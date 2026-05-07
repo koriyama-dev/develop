@@ -5,6 +5,10 @@
   "workspaceFolder": "/var/www/html",
   "remoteUser": "www-data",
   "updateRemoteUserUID": true,
+  "mounts": [
+    "source=devcontainer-vscode-server,target=/var/www/.vscode-server,type=volume",
+    "source=devcontainer-cline-data,target=/var/www/.cline,type=volume"
+  ],
   "customizations": {
     "vscode": {
       "extensions": [
