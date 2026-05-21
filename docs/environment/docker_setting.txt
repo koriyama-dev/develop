@@ -7,32 +7,30 @@ Dockerインストール
 # Docker Desktop起動
 # Settings ⇒ Resources ⇒ WSL integration ⇒ Ubuntuを「ON」
 
-# WSLログイン
-$ wsl
-
-# docker-composeファイルに移動
-
-# イメージビルド＋コンテナ構築
-$ docker compose up -d --build
-
 *****************************
 Dockerコマンド群
 *****************************
 
-# イメージビルド＋コンテナ構築(コード変更時)
+# イメージビルド＋コンテナ構築(初回 or Dockerfile変更時)
 $ docker compose up -d --build
 
-# コンテナ構築
+# コンテナ構築(compose.ymlのみ変更時)
 $ docker compose up -d
 
 # コンテナ起動
 $ docker compose start
+
+# コンテナ再起動
+$ docker compose restart
 
 # コンテナ停止
 $ docker compose stop
 
 # コンテナ削除
 $ docker compose down
+
+# コンテナ削除(ボリューム含む)
+docker compose down -v
 
 # コンテナログイン
 $ docker compose exec app bash

@@ -99,18 +99,6 @@ $ docker compose exec app php artisan tinker
 $ docker compose exec app php artisan tinker
 > Mail::raw('Mailpit Test', fn($m) => $m->to('test@example.com')->subject('Hello Mailpit'));
 
-# Laravelのschedule:testを使う
-$ docker compose logs -f app | grep "\[SCHEDULER\]"
-$ docker compose exec app php artisan schedule:test
-
-$ job
-$ docker compose logs -f app | grep "\[WORKER\]"
-$ docker compose exec app php artisan tinker --execute="Artisan::queue('about')"
-
-# redis
-$ docker compose exec app php artisan tinker
-> \Illuminate\Support\Facades\Redis::ping();
-
 # ブラウザ表示確認
 https://base.local
 
