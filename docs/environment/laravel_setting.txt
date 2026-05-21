@@ -46,7 +46,7 @@ SESSION_DRIVER=redis
 
 REDIS_CLIENT=phpredis
 REDIS_HOST=valkey # Dockerコンテナ名を指定
-REDIS_PORT=6379  # Dockerコンテナポートを指定
+REDIS_PORT=6379 # Dockerコンテナポートを指定
 CACHE_STORE=redis
 QUEUE_CONNECTION=redis
 
@@ -54,11 +54,11 @@ MAIL_MAILER=smtp # smtp
 MAIL_HOST=mailpit # Dockerコンテナ名を指定
 MAIL_PORT=1025 # Dockerコンテナポートを指定
 
-#  --- config/app.php ---
+# --- config/app.php ---
 
 'timezone' => 'Asia/Tokyo',
 
-#  --- composer.json ---
+# --- composer.json ---
 
 "require": {
     "php": "^8.5",

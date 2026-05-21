@@ -30,7 +30,7 @@ $ docker compose stop
 $ docker compose down
 
 # コンテナ削除(ボリューム含む)
-docker compose down -v
+$ docker compose down -v
 
 # コンテナログイン
 $ docker compose exec app bash
