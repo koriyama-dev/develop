@@ -13,13 +13,13 @@
 
 | 設定 | 内容 | 推奨 |
 |---|---|---|
-| Subagents | 複雑なタスクをサブエージェントに分割して並列処理 | ✅ ON |
+| Subagents | 複雑なタスクをサブエージェントに分割して並列処理 | ❌ OFF |
 | Native Tool Call | モデルネイティブのツール呼び出しを使用 | ✅ ON |
 | Parallel Tool Calling | 複数ツールを並列実行 | ✅ ON |
 | Strict Plan Mode | Planモード中は一切ファイル操作しない | ✅ ON |
 | Auto Compact | コンテキストが長くなったら自動圧縮 | ✅ ON |
 | Focus Chain | タスクの流れを追跡して集中 | ✅ ON |
-| Reminder Interval | 指示をリマインドする間隔（1-10） | 5 |
+| Reminder Interval | 指示をリマインドする間隔（1-10） | 10 |
 
 ---
 
@@ -30,7 +30,7 @@
 | Feature Tips | 機能のヒントを表示 | ❌ OFF |
 | Background Edit | バックグラウンドでファイル編集 | ❌ OFF |
 | Checkpoints | 作業前に自動チェックポイント作成 | ✅ ON |
-| Cline Web Tools | Web検索などのツールを有効化 | ✅ ON |
+| Cline Web Tools | Web検索などのツールを有効化 | ❌ OFF |
 
 ---
 
@@ -78,7 +78,7 @@
 | Shell integration timeout | シェル統合のタイムアウト秒数 | 15秒 |
 | enable aggressive terminal reuse | ターミナルを積極的に再利用 | ❌ OFF |
 | Terminal Execution Mode | 実行モード | VS Code Terminal |
-| Terminal output limit | 出力の最大行数 | 500〜1000 |
+| Terminal output limit | 出力の最大行数 | 100〜200 |
 
 ---
 
