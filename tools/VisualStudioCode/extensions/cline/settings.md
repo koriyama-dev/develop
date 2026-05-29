@@ -5,7 +5,7 @@
 | 設定 | 内容 | 推奨 |
 |---|---|---|
 | use different models for plan and act | PlanとActで別モデルを使う | ❌ OFF |
-| Reasoning Effort | 推論の深さ（low/medium/high） | high |
+| Reasoning Effort | 推論の深さ（low/medium/high） | medium |
 
 ---
 
@@ -39,7 +39,7 @@
 | 設定 | 内容 | 推奨 |
 |---|---|---|
 | Yolo Mode | 確認なしで全操作を自動実行 | ❌ OFF |
-| Double-Check Completion | 完了前に再確認する | ✅ ON |
+| Double-Check Completion | 完了前に再確認する | ✅ OFF |
 | Lazy Teammate Mode | 最小限の作業だけ行う（指示外は触らない） | ✅ ON |
 
 ---
@@ -57,9 +57,7 @@
 
 | 設定 | 内容 | 推奨 |
 |---|---|---|
-| disable browser tool usage | ブラウザ操作を無効化 | ❌ OFF |
-| viewport size | ブラウザの画面サイズ | 1280x800 |
-| use remote browser connection | リモートブラウザ接続 | ❌ OFF |
+| disable browser tool usage | ブラウザ操作を無効化 | ✅ ON |
 
 ---
 
@@ -69,9 +67,9 @@
 |---|---|---|
 | Default Terminal Profile | 使用するシェル | bash |
 | Shell integration timeout | シェル統合のタイムアウト秒数 | 15秒 |
-| enable aggressive terminal reuse | ターミナルを積極的に再利用 | ❌ OFF |
+| enable aggressive terminal reuse | ターミナルを積極的に再利用 | ✅ ON |
 | Terminal Execution Mode | 実行モード | VS Code Terminal |
-| Terminal output limit | 出力の最大行数 | 100〜200 |
+| Terminal output limit | 出力の最大行数 | 50〜100 |
 
 ---
 
