@@ -9,7 +9,7 @@
 
 ---
 
-## Feature Settings - Agent（上部）
+## Feature Settings - Agent
 
 | 設定 | 内容 | 推奨 |
 |---|---|---|
@@ -34,7 +34,7 @@
 
 ---
 
-## Feature Settings - Agent（下部）
+## Feature Settings - Experimental
 
 | 設定 | 内容 | 推奨 |
 |---|---|---|
@@ -49,13 +49,6 @@
 | 設定 | 内容 | 推奨 |
 |---|---|---|
 | Hooks | 特定イベント時にコマンド実行 | ❌ OFF |
-
----
-
-## MCP Display Mode
-
-| 設定 | 内容 | 推奨 |
-|---|---|---|
 | MCP Display Mode | MCPの表示形式 | rich display |
 
 ---
@@ -86,4 +79,5 @@
 
 | 設定 | 内容 | 推奨 |
 |---|---|---|
+| Preferred Language | 優先言語 | Japanese |
 | allow error and usage reporting | エラーと使用状況を送信 | ❌ OFF |
