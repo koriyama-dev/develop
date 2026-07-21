@@ -6,8 +6,7 @@
   "remoteUser": "www-data",
   "updateRemoteUserUID": true,
   "mounts": [
-    "source=devcontainer-vscode-server,target=/var/www/.vscode-server,type=volume",
-    "source=devcontainer-cline-data,target=/var/www/.cline,type=volume"
+    "source=devcontainer-vscode-server,target=/var/www/.vscode-server,type=volume"
   ],
   "customizations": {
     "vscode": {
@@ -20,9 +19,7 @@
         "ms-azuretools.vscode-containers",
         "bmewburn.vscode-intelephense-client",
         "xdebug.php-debug",
-        "cweijan.vscode-mysql-client2",
-        "Codeium.codeium",
-        "saoudrizwan.claude-dev"
+        "cweijan.vscode-mysql-client2"
       ]
     }
   }

@@ -28,11 +28,5 @@ docker run --rm \
   -v ${SANDBOX}_devcontainer-vscode-server:/var/www/.vscode-server \
   busybox chown -R 1000:1000 /var/www/.vscode-server
 
-# cline-data volumeの所有権を修正
-docker volume create ${SANDBOX}_devcontainer-cline-data 2>/dev/null
-docker run --rm \
-  -v ${SANDBOX}_devcontainer-cline-data:/var/www/.cline \
-  busybox chown -R 1000:1000 /var/www/.cline
-
 # VSCodeを起動
 export SANDBOX_NAME=$SANDBOX && code /home/developer/develop/environment/src
