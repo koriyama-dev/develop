@@ -7,7 +7,6 @@
 .phpunit.result.cache
 /.vscode
 /.devcontainer
-/.clinerules
 /.codex
 /.cursor/
 /.idea
