@@ -19,7 +19,7 @@ $ wsl -e hostname -I
 # powershellからWindowsのhosts設定
 $ powershell -NoProfile -ExecutionPolicy unrestricted -Command "start notepad C:\Windows\System32\drivers\etc\hosts -verb runas"
 
-# 「exclude」フォルダから除外ファイルを「src」に設置
+# 除外ファイルを「src」に設置
 
 *****************************
 Laravel初期設定
