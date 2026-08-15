@@ -18,7 +18,6 @@ dev tool
 
 Windows Terminal(管理者実行)
 WSL
-RLogin
 WinSCP
 Git
 SourceTree
