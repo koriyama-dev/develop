@@ -41,7 +41,12 @@
     {
         "defaults":
         {
+            "altGrAliasing": false,
             "elevate": true,
+            "font":
+            {
+                "colorGlyphs": false
+            },
             "scrollbarState": "hidden",
             "startingDirectory": "C:\\"
         },
